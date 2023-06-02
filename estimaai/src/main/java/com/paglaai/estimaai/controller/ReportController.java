@@ -25,7 +25,6 @@ import java.util.List;
 @RequestMapping("/report")
 public class ReportController {
     private final JasperReportService jasperReportService;
-    //private final TestReportService testReportService;
 
     @GetMapping
     public void generateReport(HttpServletResponse response, @RequestParam String exportType) {
@@ -48,6 +47,7 @@ public class ReportController {
                 .setFeatureTitle("User Authentication")
                 .setFeatureIntent("Verify user identity")
                 .setSubtasksOfFeatures("Login functionality")
+                .setImplementationTime("2")
                 .setComplexity("2"));
 
         try {
