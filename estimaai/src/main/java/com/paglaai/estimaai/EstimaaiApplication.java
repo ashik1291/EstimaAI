@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class EstimaaiApplication {
 
     public static void main(String[] args) {
-        System.out.println("Test from EstimaAI");
         SpringApplication.run(EstimaaiApplication.class, args);
     }
 
