@@ -65,7 +65,7 @@ public class SpringSecurity {
         httpSecurity.authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                .requestMatchers("/report", "/generate-report").permitAll()
+                .requestMatchers("/report", "/generate-report","/csv-to-json").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

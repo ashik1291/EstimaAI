@@ -1,4 +1,4 @@
-package com.paglaai.estimaai.aop;
+package com.paglaai.estimaai.advice;
 
 import com.paglaai.estimaai.exception.DynamicReportException;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;

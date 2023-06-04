@@ -1,0 +1,16 @@
+featureTitle,featureIntent,subtasksOfFeatures,implementationTime,complexity,kloc
+User Registration,Register new users,Design user registration form,10,3,1
+User Registration,Register new users,Implement user registration logic,8,3,1
+User Registration,Register new users,Integrate with email verification service,2,3,0.5
+Loyalty Program Setup,Configure loyalty program,Define loyalty program rules,6,3,0.5
+Loyalty Program Setup,Configure loyalty program,Set up reward points system,6,3,0.5
+Loyalty Program Setup,Configure loyalty program,Specify program levels and benefits,4,3,0.5
+Customer Profile Management,Manage customer information,Create customer profile form,8,4,1
+Customer Profile Management,Manage customer information,Implement profile update functionality,10,4,1.5
+Customer Profile Management,Manage customer information,Store and retrieve customer data,6,4,0.5
+Points Tracking and Redemption,Track and redeem reward points,Implement points tracking mechanism,12,4,1
+Points Tracking and Redemption,Track and redeem reward points,Provide points redemption options,12,4,1
+Points Tracking and Redemption,Track and redeem reward points,Update customer points balance,8,4,1
+Reporting and Analytics,Generate loyalty program reports,Define report requirements,10,5,1
+Reporting and Analytics,Generate loyalty program reports,Develop report generation module,18,5,2
+Reporting and Analytics,Generate loyalty program reports,Implement analytics functionality,12,5,1.5

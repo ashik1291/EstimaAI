@@ -15,4 +15,5 @@ public class ReportData {
     private String subtasksOfFeatures;
     private String implementationTime;
     private String complexity;
+    private String kloc;
 }
