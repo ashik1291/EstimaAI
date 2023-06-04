@@ -1,43 +1,28 @@
 package com.paglaai.estimaai.service;
 
 import com.paglaai.estimaai.domain.dto.UserDto;
-import com.paglaai.estimaai.repository.entity.Role;
-import com.paglaai.estimaai.repository.entity.User;
+import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.repository.UserRepository;
+import com.paglaai.estimaai.repository.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
-    private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
 
-    public void saveUser(UserDto userDto){
+    public UserDto findUserByEmail(String email) {
 
-        User user = new User();
-        var lastName = userDto.getLastName() == null ? "": userDto.getLastName();
-        user.setName(userDto.getFirstName().concat(" ").concat(lastName))
-                .setEmail(userDto.getEmail())
-                .setPassword(passwordEncoder.encode(userDto.getPassword()));
-
-        Role role = roleService.getRoleByName("ROLE_ADMIN");
-        if(role == null){
-            role = roleService.checkRoleExist();
+        var userEntity =  userRepository.findByEmail(email);
+        if(userEntity == null){
+            throw new UserNotFoundException("No user was found.");
         }
-        user.setRoles(Collections.singletonList(role));
-        userRepository.save(user);
-    }
-
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return mapToUserDto(userEntity);
     }
 
 
