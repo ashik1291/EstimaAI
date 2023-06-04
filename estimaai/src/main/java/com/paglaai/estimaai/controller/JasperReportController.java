@@ -1,6 +1,6 @@
 package com.paglaai.estimaai.controller;
 
-import com.paglaai.estimaai.domain.dto.ReportData;
+import com.paglaai.estimaai.exception.NoExportTypeFoundException;
 import com.paglaai.estimaai.service.JasperReportGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,39 +9,34 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+
 public class JasperReportController {
 
     private final JasperReportGenerator jasperReportGenerator;
 
     @GetMapping("/generate-report")
-    public ResponseEntity<byte[]> generateReport() {
+    public ResponseEntity<byte[]> generateReport(String userStories, String exportType) {
+        final var reportFileName = "estimation_report".concat(
+                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
+                .concat(".").concat(exportType).toLowerCase();
 
-        List<ReportData> table1Data = new ArrayList<>();
-        table1Data.add(new ReportData()
-                .setFeatureTitle("User Authentication")
-                .setFeatureIntent("Verify user identity")
-                .setSubtasksOfFeatures("User registration")
-                .setImplementationTime("4")
-                .setComplexity("3"));
-        table1Data.add(new ReportData()
-                .setFeatureTitle("User Authentication")
-                .setFeatureIntent("Verify user identity")
-                .setSubtasksOfFeatures("Login functionality")
-                .setImplementationTime("2")
-                .setComplexity("2"));
-
-        ByteArrayOutputStream reportStream = jasperReportGenerator.make(table1Data, table1Data);
+        ByteArrayOutputStream reportStream = jasperReportGenerator.processReport("table1Data", "pdf");
         byte[] reportBytes = reportStream.toByteArray();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDisposition(ContentDisposition.attachment().filename("report.pdf").build());
+
+        if("PDF".equalsIgnoreCase(exportType)){
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.attachment().filename(reportFileName).build());
+        }else{
+            throw  new NoExportTypeFoundException("No export type found");
+        }
 
         return new ResponseEntity<>(reportBytes, headers, HttpStatus.OK);
     }
