@@ -1,54 +1,55 @@
 package com.paglaai.estimaai.service;
 
 import com.paglaai.estimaai.domain.dto.UserDto;
-import com.paglaai.estimaai.repository.entity.Role;
-import com.paglaai.estimaai.repository.entity.User;
+import com.paglaai.estimaai.domain.dto.UserProfileWithHistories;
+import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.repository.UserRepository;
+import com.paglaai.estimaai.repository.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
-    private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
 
-    public void saveUser(UserDto userDto){
+    public UserDto findUserByEmail(String email) {
 
-        User user = new User();
-        var lastName = userDto.getLastName() == null ? "": userDto.getLastName();
-        user.setName(userDto.getFirstName().concat(" ").concat(lastName))
-                .setEmail(userDto.getEmail())
-                .setPassword(passwordEncoder.encode(userDto.getPassword()));
-
-        Role role = roleService.getRoleByName("ROLE_ADMIN");
-        if(role == null){
-            role = roleService.checkRoleExist();
+        var userEntity =  userRepository.findByEmail(email);
+        if(userEntity == null){
+            throw new UserNotFoundException("No user was found.");
         }
-        user.setRoles(Collections.singletonList(role));
-        userRepository.save(user);
-    }
-
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return mapToUserDto(userEntity);
     }
 
 
     public List<UserDto> findAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<UserEntity> users = userRepository.findAll();
         return users.stream()
                 .map(this::mapToUserDto)
                 .collect(Collectors.toList());
     }
 
-    private UserDto mapToUserDto(User user){
+    public UserProfileWithHistories getProfileWithReportHistory(){
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userEntity = userRepository.findByEmail(email);
+        if(userEntity == null){
+            throw new UserNotFoundException("No user profile found.");
+        }
+
+        var userProfileWithHistories = new UserProfileWithHistories();
+        userProfileWithHistories.setName(userEntity.getName());
+        userProfileWithHistories.setEmail(email);
+        userProfileWithHistories.setReportHistories(userEntity.getReportHistoryEntities());
+
+        return userProfileWithHistories;
+    }
+
+    private UserDto mapToUserDto(UserEntity user){
         UserDto userDto = new UserDto();
         String[] str = user.getName().split(" ");
         userDto.setFirstName(str[0]);
