@@ -1,6 +1,5 @@
 package com.paglaai.estimaai.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -9,7 +8,10 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.paglaai.estimaai.domain.dto.ReportData;
 import com.paglaai.estimaai.exception.DynamicReportException;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
-import net.sf.dynamicreports.jasper.builder.JasperConcatenatedReportBuilder;
+import com.paglaai.estimaai.repository.ReportHistoryRepository;
+import com.paglaai.estimaai.repository.UserRepository;
+import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
+import lombok.RequiredArgsConstructor;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
@@ -23,14 +25,19 @@ import org.springframework.stereotype.Service;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class ReportService {
 
-    public ByteArrayOutputStream processReport(String userStories, String exportType, String title) throws IOException {
+    private final ReportHistoryRepository reportHistoryRepository;
+    private final UserRepository userRepository;
+
+    public ByteArrayOutputStream processReport(String jsonData, String exportType, String title) throws IOException {
 
         // Output Stream Object
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -54,7 +61,13 @@ public class ReportService {
             e.printStackTrace();
             throw new DynamicReportException("Error while processing reports");
         }
-
+        ObjectMapper objectMapper = new ObjectMapper();
+        var reportHistoryEntity  = new ReportHistoryEntity();
+        reportHistoryEntity.setTitle(title.concat(" project estimation"));
+        reportHistoryEntity.setGenerationTime(LocalDateTime.now());
+        reportHistoryEntity.setJsonData(dataList);
+        reportHistoryEntity.setUsers(userRepository.findByEmail("ashikur.bhuiyan@yopmail.com"));
+        reportHistoryRepository.save(reportHistoryEntity);
         return outputStream;
 
     }
@@ -211,11 +224,8 @@ public class ReportService {
             }
             modifiedList.add(currentPojo);
         }
-
-
-
         // Optional: Print the JSON data
-        System.out.println(jsonData);
+        //System.out.println(jsonData);
         return modifiedList;
     }
 

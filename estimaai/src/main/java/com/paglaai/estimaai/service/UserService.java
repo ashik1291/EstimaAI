@@ -1,12 +1,13 @@
 package com.paglaai.estimaai.service;
 
 import com.paglaai.estimaai.domain.dto.UserDto;
+import com.paglaai.estimaai.domain.dto.UserProfileWithHistories;
 import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.repository.UserRepository;
-import com.paglaai.estimaai.repository.entity.User;
+import com.paglaai.estimaai.repository.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +28,28 @@ public class UserService {
 
 
     public List<UserDto> findAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<UserEntity> users = userRepository.findAll();
         return users.stream()
                 .map(this::mapToUserDto)
                 .collect(Collectors.toList());
     }
 
-    private UserDto mapToUserDto(User user){
+    public UserProfileWithHistories getProfileWithReportHistory(){
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userEntity = userRepository.findByEmail(email);
+        if(userEntity == null){
+            throw new UserNotFoundException("No user profile found.");
+        }
+
+        var userProfileWithHistories = new UserProfileWithHistories();
+        userProfileWithHistories.setName(userEntity.getName());
+        userProfileWithHistories.setEmail(email);
+        userProfileWithHistories.setReportHistories(userEntity.getReportHistoryEntities());
+
+        return userProfileWithHistories;
+    }
+
+    private UserDto mapToUserDto(UserEntity user){
         UserDto userDto = new UserDto();
         String[] str = user.getName().split(" ");
         userDto.setFirstName(str[0]);

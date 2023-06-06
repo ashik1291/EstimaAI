@@ -1,7 +1,7 @@
 package com.paglaai.estimaai.service;
 
-import com.paglaai.estimaai.repository.entity.Role;
-import com.paglaai.estimaai.repository.entity.User;
+import com.paglaai.estimaai.repository.entity.RoleEntity;
+import com.paglaai.estimaai.repository.entity.UserEntity;
 import com.paglaai.estimaai.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email);
+        UserEntity user = userRepository.findByEmail(email);
 
         if (user != null) {
             return new org.springframework.security.core.userdetails.User(user.getEmail(),
@@ -35,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
     }
 
-    private Collection < ? extends GrantedAuthority> mapRolesToAuthorities(Collection <Role> roles) {
+    private Collection < ? extends GrantedAuthority> mapRolesToAuthorities(Collection <RoleEntity> roles) {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());

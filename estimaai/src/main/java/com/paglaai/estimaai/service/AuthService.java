@@ -4,7 +4,7 @@ import com.paglaai.estimaai.domain.dto.AuthenticationRequest;
 import com.paglaai.estimaai.domain.dto.AuthenticationResponse;
 import com.paglaai.estimaai.domain.dto.UserDto;
 import com.paglaai.estimaai.domain.mapper.DtoToEntityMapper;
-import com.paglaai.estimaai.repository.entity.Role;
+import com.paglaai.estimaai.repository.entity.RoleEntity;
 import com.paglaai.estimaai.repository.RoleRepository;
 import com.paglaai.estimaai.repository.UserRepository;
 import com.paglaai.estimaai.security.JwtTokenProvider;
@@ -51,7 +51,7 @@ public class AuthService {
 
         var role = roleRepository.findByName("ADMIN");
         if(role == null){
-            var newRoles = new Role();
+            var newRoles = new RoleEntity();
             newRoles.setName("ADMIN");
             role = newRoles;
         }
