@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Accessors(chain = true)
 @Table(name = "users")
-public class User {
+public class UserEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -38,6 +38,8 @@ public class User {
     @JoinTable(name = "users_roles",
             joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
             inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
-    private List<Role> roles = new ArrayList<>();
+    private List<RoleEntity> roles = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "users")
+    private List<ReportHistoryEntity> reportHistoryEntities = new ArrayList<>();
 }

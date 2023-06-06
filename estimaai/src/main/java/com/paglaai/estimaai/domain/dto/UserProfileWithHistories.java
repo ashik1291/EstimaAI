@@ -1,0 +1,21 @@
+package com.paglaai.estimaai.domain.dto;
+
+import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class UserProfileWithHistories{
+
+    private String name;
+    private String email;
+    private List<ReportHistoryEntity> reportHistories;
+}

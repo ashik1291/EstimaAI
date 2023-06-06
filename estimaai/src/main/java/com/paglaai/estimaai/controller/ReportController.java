@@ -8,15 +8,16 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.paglaai.estimaai.domain.dto.ReportData;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
 import com.paglaai.estimaai.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
+import net.sf.dynamicreports.report.exception.DRException;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -36,7 +37,10 @@ public class ReportController {
 
     private final ReportService jasperReportGenerator;
 
+
+
     @GetMapping("/generate-report")
+    @Operation(hidden = true)
     public ResponseEntity<byte[]> generateReport(String userStories, String exportType, String title) throws IOException {
         final var reportFileName = title.concat("_").concat(
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
@@ -60,56 +64,43 @@ public class ReportController {
         return new ResponseEntity<>(reportBytes, headers, HttpStatus.OK);
     }
 
-    @PostMapping("/csv-to-json")
-    public List<ReportData> convertCsvToJson() throws IOException {
-        // Load the CSV file from the resources folder
-        ClassPathResource csvFileResource = new ClassPathResource("input_feature.csv");
-        File csvFile = csvFileResource.getFile();
+    @PostMapping("/process-user-stories")
+    public ResponseEntity<List<ReportData>> processStories(String userStories){
+        return ResponseEntity.ok(List.of(new ReportData()));
+    }
 
-        // Create a CsvMapper and configure it
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
+    @PostMapping("generate-report-from-json")
+    public ResponseEntity<byte[]> generateReportFromJson(@RequestParam String jsonData, @RequestParam String title, @RequestParam String exportType ) throws IOException, DRException {
+        final var reportFileName = title.concat("_").concat(
+                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
+                .concat(".").concat(exportType).toLowerCase();
 
-        // Read the CSV file into a List of Maps
-        List<Object> csvData = csvMapper.readerFor(Map.class)
-                .with(csvSchema)
-                .readValues(csvFile)
-                .readAll();
-
-        // Convert the List of Maps to JSON
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        String jsonData = objectMapper.writeValueAsString(csvData);
-
-        // Map the JSON data to POJO using ObjectMapper
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         List<ReportData> pojoList = objectMapper.readValue(jsonData, new TypeReference<>() {
         });
 
-        if(pojoList.isEmpty()){
-            return pojoList;
+        JasperReportBuilder reportStream = jasperReportGenerator.generateReport(pojoList, title);
+
+        byte[] reportBytes = new byte[]{};//reportStream.toByteArray();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        if("PDF".equalsIgnoreCase(exportType)){
+            reportStream.toPdf(outputStream);
+            headers.setContentType(MediaType.valueOf("application/pdf"));
+            headers.setContentDisposition(ContentDisposition.attachment().filename(reportFileName).build());
+        } else if ("XLSX".equalsIgnoreCase(exportType)) {
+            reportStream.toXlsx(outputStream);
+            headers.setContentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDisposition(ContentDisposition.attachment().filename(reportFileName).build());
+        } else{
+            throw  new NoExportTypeFoundException("No export type found");
         }
 
-        List<ReportData> modifiedList = new ArrayList<>();
-        modifiedList.add(pojoList.get(0));
-        String currentFeatureTitle =  pojoList.get(0).getFeatureTitle();
-        for(int i = 1; i< pojoList.size(); i++){
-            var currentPojo = pojoList.get(i);
-            if(currentPojo.getFeatureTitle().equalsIgnoreCase(currentFeatureTitle)){
-                currentPojo.setFeatureTitle(null);
-            }else{
-                currentFeatureTitle = currentPojo.getFeatureTitle();
-            }
-            modifiedList.add(currentPojo);
-        }
-
-
-
-        // Optional: Print the JSON data
-        System.out.println(jsonData);
-        return modifiedList;
-
+        return new ResponseEntity<>(reportBytes, headers, HttpStatus.OK);
     }
-
 }
 
 

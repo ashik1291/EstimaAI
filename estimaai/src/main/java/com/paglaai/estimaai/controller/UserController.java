@@ -1,6 +1,7 @@
 package com.paglaai.estimaai.controller;
 
 import com.paglaai.estimaai.domain.dto.UserDto;
+import com.paglaai.estimaai.domain.dto.UserProfileWithHistories;
 import com.paglaai.estimaai.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,4 +20,10 @@ public class UserController {
     public ResponseEntity<UserDto> getUserProfileByEmail(@PathVariable String email){
         return ResponseEntity.ok(userService.findUserByEmail(email));
     }
+
+    @GetMapping("/profile-report-histories")
+    public ResponseEntity<UserProfileWithHistories> getUserProfileWithReportHistories(){
+        return ResponseEntity.ok(userService.getProfileWithReportHistory());
+    }
+
 }
