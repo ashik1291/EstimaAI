@@ -1,6 +1,6 @@
 package com.paglaai.estimaai.service;
 
-import com.paglaai.estimaai.repository.entity.Role;
+import com.paglaai.estimaai.repository.entity.RoleEntity;
 import com.paglaai.estimaai.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,11 +11,11 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
 
-    public Role getRoleByName(String roleName){
+    public RoleEntity getRoleByName(String roleName){
         return roleRepository.findByName(roleName);
     }
-    public Role checkRoleExist(){
-        Role role = new Role();
+    public RoleEntity checkRoleExist(){
+        RoleEntity role = new RoleEntity();
         role.setName("ROLE_ADMIN");
         return roleRepository.save(role);
     }
