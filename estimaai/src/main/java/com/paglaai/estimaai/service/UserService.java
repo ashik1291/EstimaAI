@@ -1,5 +1,7 @@
 package com.paglaai.estimaai.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paglaai.estimaai.domain.dto.UserDto;
 import com.paglaai.estimaai.domain.dto.UserProfileWithHistories;
 import com.paglaai.estimaai.exception.UserNotFoundException;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     public UserDto findUserByEmail(String email) {
 
@@ -34,7 +37,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public UserProfileWithHistories getProfileWithReportHistory(){
+    public UserProfileWithHistories getProfileWithReportHistory() throws JsonProcessingException {
         var email = SecurityContextHolder.getContext().getAuthentication().getName();
         var userEntity = userRepository.findByEmail(email);
         if(userEntity == null){
@@ -45,6 +48,8 @@ public class UserService {
         userProfileWithHistories.setName(userEntity.getName());
         userProfileWithHistories.setEmail(email);
         userProfileWithHistories.setReportHistories(userEntity.getReportHistoryEntities());
+
+        var x = objectMapper.writeValueAsString(userEntity.getReportHistoryEntities().get(0));
 
         return userProfileWithHistories;
     }

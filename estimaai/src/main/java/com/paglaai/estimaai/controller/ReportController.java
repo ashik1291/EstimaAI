@@ -36,7 +36,7 @@ import java.util.Map;
 public class ReportController {
 
     private final ReportService jasperReportGenerator;
-
+    private final ObjectMapper objectMapper;
 
 
     @GetMapping("/generate-report")
@@ -70,20 +70,19 @@ public class ReportController {
     }
 
     @PostMapping("generate-report-from-json")
-    public ResponseEntity<byte[]> generateReportFromJson(@RequestParam String jsonData, @RequestParam String title, @RequestParam String exportType ) throws IOException, DRException {
+    public ResponseEntity<byte[]> generateReportFromJson(@RequestBody List<ReportData> reportDataList, @RequestParam String title, @RequestParam String exportType ) throws IOException, DRException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        //byte[] reportBytes = new byte[]{};//reportStream.toByteArray();
+
         final var reportFileName = title.concat("_").concat(
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
                 .concat(".").concat(exportType).toLowerCase();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        List<ReportData> pojoList = objectMapper.readValue(jsonData, new TypeReference<>() {
-        });
+//        List<ReportData> pojoList = objectMapper.readValue(jsonData, new TypeReference<>() {
+//        });
 
-        JasperReportBuilder reportStream = jasperReportGenerator.generateReport(pojoList, title);
-
-        byte[] reportBytes = new byte[]{};//reportStream.toByteArray();
+        JasperReportBuilder reportStream = jasperReportGenerator.generateReport(reportDataList, title);
 
         HttpHeaders headers = new HttpHeaders();
 
@@ -99,7 +98,7 @@ public class ReportController {
             throw  new NoExportTypeFoundException("No export type found");
         }
 
-        return new ResponseEntity<>(reportBytes, headers, HttpStatus.OK);
+        return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
     }
 }
 

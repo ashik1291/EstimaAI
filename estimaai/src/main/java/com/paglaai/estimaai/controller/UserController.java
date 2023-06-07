@@ -1,5 +1,6 @@
 package com.paglaai.estimaai.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.paglaai.estimaai.domain.dto.UserDto;
 import com.paglaai.estimaai.domain.dto.UserProfileWithHistories;
 import com.paglaai.estimaai.service.UserService;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/profile-report-histories")
-    public ResponseEntity<UserProfileWithHistories> getUserProfileWithReportHistories(){
+    public ResponseEntity<UserProfileWithHistories> getUserProfileWithReportHistories() throws JsonProcessingException {
         return ResponseEntity.ok(userService.getProfileWithReportHistory());
     }
 
