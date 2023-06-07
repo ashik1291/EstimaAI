@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
+    //id 'org.springframework.cloud' version 'x.x.x'
 }
 
 group = 'com.paglaai'
@@ -16,6 +17,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://repo.spring.io/milestone' // Use the appropriate repository URL (e.g., milestone or release)
+    }
 }
 
 dependencies {
@@ -26,6 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '3.1.0'
     implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.2'
 
 
     // Token Generation

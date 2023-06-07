@@ -2,8 +2,8 @@ package com.paglaai.estimaai.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paglaai.estimaai.domain.dto.ReportData;
+import com.paglaai.estimaai.configuration.StartupConfiguration;
+import com.paglaai.estimaai.domain.ReportData;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,9 +13,10 @@ import java.util.List;
 
 @Getter
 @Setter
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@SuppressWarnings("all")
 @Table(name = "report_history")
 public class ReportHistoryEntity {
 
@@ -38,7 +39,7 @@ public class ReportHistoryEntity {
 
     public List<ReportData> getJsonData() {
         try {
-            var data = new ObjectMapper().readValue(jsonData, ReportData[].class);
+            var data = StartupConfiguration.objectMapper().readValue(jsonData, ReportData[].class);
             if (data != null) {
                 return List.of(data);
             }
@@ -49,7 +50,7 @@ public class ReportHistoryEntity {
 
     public void setJsonData(Object jsonData) {
         try {
-            this.jsonData = new ObjectMapper().writeValueAsString(jsonData);
+            this.jsonData = StartupConfiguration.objectMapper().writeValueAsString(jsonData);
         } catch (JsonProcessingException e) {
             this.jsonData = "{}";
         }

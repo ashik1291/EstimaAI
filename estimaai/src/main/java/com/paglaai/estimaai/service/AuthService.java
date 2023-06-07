@@ -1,9 +1,9 @@
 package com.paglaai.estimaai.service;
 
-import com.paglaai.estimaai.domain.dto.AuthenticationRequest;
-import com.paglaai.estimaai.domain.dto.AuthenticationResponse;
-import com.paglaai.estimaai.domain.dto.UserDto;
-import com.paglaai.estimaai.domain.mapper.DtoToEntityMapper;
+import com.paglaai.estimaai.domain.AuthenticationRequest;
+import com.paglaai.estimaai.domain.AuthenticationResponse;
+import com.paglaai.estimaai.domain.UserDto;
+import com.paglaai.estimaai.mapper.DtoToEntityMapper;
 import com.paglaai.estimaai.repository.entity.RoleEntity;
 import com.paglaai.estimaai.repository.RoleRepository;
 import com.paglaai.estimaai.repository.UserRepository;

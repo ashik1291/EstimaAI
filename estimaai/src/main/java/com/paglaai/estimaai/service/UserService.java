@@ -2,8 +2,8 @@ package com.paglaai.estimaai.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paglaai.estimaai.domain.dto.UserDto;
-import com.paglaai.estimaai.domain.dto.UserProfileWithHistories;
+import com.paglaai.estimaai.domain.UserDto;
+import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.repository.UserRepository;
 import com.paglaai.estimaai.repository.entity.UserEntity;

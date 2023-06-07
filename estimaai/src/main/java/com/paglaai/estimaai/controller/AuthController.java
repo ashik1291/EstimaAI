@@ -1,7 +1,7 @@
 package com.paglaai.estimaai.controller;
 
-import com.paglaai.estimaai.domain.dto.UserDto;
-import com.paglaai.estimaai.domain.dto.AuthenticationRequest;
+import com.paglaai.estimaai.domain.UserDto;
+import com.paglaai.estimaai.domain.AuthenticationRequest;
 import com.paglaai.estimaai.service.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,13 +1,14 @@
 package com.paglaai.estimaai.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import com.paglaai.estimaai.domain.dto.ReportData;
+import com.paglaai.estimaai.configuration.StartupConfiguration;
+import com.paglaai.estimaai.domain.ReportData;
+import com.paglaai.estimaai.domain.request.MlEstimaBody;
 import com.paglaai.estimaai.exception.DynamicReportException;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
+import com.paglaai.estimaai.feign.MLFeign;
 import com.paglaai.estimaai.repository.ReportHistoryRepository;
 import com.paglaai.estimaai.repository.UserRepository;
 import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
@@ -19,6 +20,7 @@ import net.sf.dynamicreports.report.builder.component.VerticalListBuilder;
 import net.sf.dynamicreports.report.constant.*;
 import net.sf.dynamicreports.report.exception.DRException;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +38,7 @@ public class ReportService {
 
     private final ReportHistoryRepository reportHistoryRepository;
     private final UserRepository userRepository;
+    private final MLFeign mlFeign;
 
     public ByteArrayOutputStream processReport(String jsonData, String exportType, String title) throws IOException {
 
@@ -43,17 +46,17 @@ public class ReportService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // Prepare and Get Data
-       var dataList = getRealData();
+        var dataList = getRealData();
 
         // Get Report (JasperReportBuilder)
         JasperReportBuilder report = generateReport(dataList, title.concat(" project estimation"));
 
         try {
-            if("PDF".equalsIgnoreCase(exportType)){
+            if ("PDF".equalsIgnoreCase(exportType)) {
                 report.toPdf(outputStream);
-            }else if("XLSX".equalsIgnoreCase(exportType)){
+            } else if ("XLSX".equalsIgnoreCase(exportType)) {
                 report.toXlsx(outputStream);
-            }else{
+            } else {
                 throw new NoExportTypeFoundException("No export type found.");
             }
 
@@ -61,8 +64,7 @@ public class ReportService {
             e.printStackTrace();
             throw new DynamicReportException("Error while processing reports");
         }
-        ObjectMapper objectMapper = new ObjectMapper();
-        var reportHistoryEntity  = new ReportHistoryEntity();
+        var reportHistoryEntity = new ReportHistoryEntity();
         reportHistoryEntity.setTitle(title.concat(" project estimation"));
         reportHistoryEntity.setGenerationTime(LocalDateTime.now());
         reportHistoryEntity.setJsonData(dataList);
@@ -163,7 +165,7 @@ public class ReportService {
         report.setColumnTitleStyle(DynamicReports.stl.style(DynamicReports.stl.style().bold())
                 .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
                 .setBorder(DynamicReports.stl.pen1Point()).setLeftPadding(5).setRightPadding(5)
-                        .setBottomPadding(5).setTopPadding(5)
+                .setBottomPadding(5).setTopPadding(5)
                 .setBackgroundColor(Color.decode("#317773")).bold().setForegroundColor(Color.WHITE).setBorder(DynamicReports.stl.penThin().setLineColor(Color.BLACK)));
 
         // Configuration when data splits into other pages
@@ -199,27 +201,22 @@ public class ReportService {
                 .readValues(csvFile)
                 .readAll();
 
-        // Convert the List of Maps to JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        String jsonData = objectMapper.writeValueAsString(csvData);
-
-        // Map the JSON data to POJO using ObjectMapper
-        List<ReportData> pojoList = objectMapper.readValue(jsonData, new TypeReference<>() {
+        // Convert the List of Maps to JSON  AND Map the JSON data to POJO using ObjectMapper
+        List<ReportData> pojoList = StartupConfiguration.objectMapper().readValue(StartupConfiguration.objectMapper().writeValueAsString(csvData), new TypeReference<>() {
         });
 
-        if(pojoList.isEmpty()){
+        if (pojoList.isEmpty()) {
             return pojoList;
         }
 
         List<ReportData> modifiedList = new ArrayList<>();
         modifiedList.add(pojoList.get(0));
-        String currentFeatureTitle =  pojoList.get(0).getFeatureTitle();
-        for(int i = 1; i< pojoList.size(); i++){
+        String currentFeatureTitle = pojoList.get(0).getFeatureTitle();
+        for (int i = 1; i < pojoList.size(); i++) {
             var currentPojo = pojoList.get(i);
-            if(currentPojo.getFeatureTitle().equalsIgnoreCase(currentFeatureTitle)){
+            if (currentPojo.getFeatureTitle().equalsIgnoreCase(currentFeatureTitle)) {
                 currentPojo.setFeatureTitle(null);
-            }else{
+            } else {
                 currentFeatureTitle = currentPojo.getFeatureTitle();
             }
             modifiedList.add(currentPojo);
@@ -229,7 +226,7 @@ public class ReportService {
         return modifiedList;
     }
 
-    public List<ReportData> getDataList(){
+    public List<ReportData> getDataList() {
         List<ReportData> data = new ArrayList<>();
 
         data.add(new ReportData()
@@ -246,6 +243,14 @@ public class ReportService {
                 .setComplexity("2"));
 
         return data;
+    }
+
+    public List<ReportData> getProcessedFeatureList(String stories) {
+        return mlFeign.getFeatures(new MlEstimaBody().setStory(stories)).stream().map(m -> {
+            var item = new ReportData();
+            BeanUtils.copyProperties(m, item);
+            return item;
+        }).toList();
     }
 }
 

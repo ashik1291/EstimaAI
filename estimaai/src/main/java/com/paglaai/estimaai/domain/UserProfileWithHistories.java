@@ -1,4 +1,4 @@
-package com.paglaai.estimaai.domain.dto;
+package com.paglaai.estimaai.domain;
 
 import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
 import lombok.AllArgsConstructor;
