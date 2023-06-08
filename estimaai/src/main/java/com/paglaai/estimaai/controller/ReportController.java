@@ -1,7 +1,9 @@
 package com.paglaai.estimaai.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paglaai.estimaai.domain.ReportData;
+import com.paglaai.estimaai.domain.BreakdownData;
+import com.paglaai.estimaai.domain.request.UserStoriesAndTitle;
+import com.paglaai.estimaai.domain.response.ReportData;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
 import com.paglaai.estimaai.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,8 +56,8 @@ public class ReportController {
     }
 
     @PostMapping("/process-user-stories")
-    public ResponseEntity<List<ReportData>> processStories(String userStories) {
-        return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStories));
+    public ResponseEntity<List<ReportData>> processStories(@RequestBody List<UserStoriesAndTitle> userStoriesAndTitles) {
+        return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStoriesAndTitles));
     }
 
     @PostMapping("generate-report-from-json")
@@ -71,7 +73,7 @@ public class ReportController {
 //        List<ReportData> pojoList = objectMapper.readValue(jsonData, new TypeReference<>() {
 //        });
 
-        JasperReportBuilder reportStream = jasperReportGenerator.generateReport(reportDataList, title);
+        JasperReportBuilder reportStream = jasperReportGenerator.generateReportWrapper(reportDataList, title);
 
         HttpHeaders headers = new HttpHeaders();
 

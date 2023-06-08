@@ -3,7 +3,8 @@ package com.paglaai.estimaai.repository.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.paglaai.estimaai.configuration.StartupConfiguration;
-import com.paglaai.estimaai.domain.ReportData;
+import com.paglaai.estimaai.domain.BreakdownData;
+import com.paglaai.estimaai.domain.response.ReportData;
 import jakarta.persistence.*;
 import lombok.*;
 

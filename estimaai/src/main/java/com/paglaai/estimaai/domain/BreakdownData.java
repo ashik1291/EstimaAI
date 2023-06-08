@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReportData {
+public class BreakdownData {
     private String featureTitle;
     private String featureIntent;
     private String subtasksOfFeatures;

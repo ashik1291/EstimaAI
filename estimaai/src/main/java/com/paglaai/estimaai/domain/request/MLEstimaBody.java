@@ -5,6 +5,6 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class MlEstimaBody {
+public class MLEstimaBody {
     private String story;
 }
