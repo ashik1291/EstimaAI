@@ -17,13 +17,17 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoExportTypeFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(NoExportTypeFoundException ex) {
+    public ResponseEntity<String> handleNoExportTypeFoundException(NoExportTypeFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(DynamicReportException.class)
-    public ResponseEntity<String> handleUserNotFoundException(DynamicReportException ex) {
-        return ResponseEntity.status(HttpStatus.PROCESSING).body(ex.getMessage());
+    public ResponseEntity<String> handleDynamicReportException(DynamicReportException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }
 

@@ -42,4 +42,7 @@ public class UserEntity {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "users")
     private List<ReportHistoryEntity> reportHistoryEntities = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "userEntity")
+    private UserTeamMemberSurveyEntity userTeamMemberSurveyEntity;
 }

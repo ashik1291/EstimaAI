@@ -68,7 +68,7 @@ public class ReportService {
         reportHistoryEntity.setTitle(title.concat(" project estimation"));
         reportHistoryEntity.setGenerationTime(LocalDateTime.now());
         reportHistoryEntity.setJsonData(dataList);
-        reportHistoryEntity.setUsers(userRepository.findByEmail("ashikur.bhuiyan@yopmail.com"));
+        reportHistoryEntity.setUsers(userRepository.findByEmail("ashik.bhuiyan@yopmail.com"));
         reportHistoryRepository.save(reportHistoryEntity);
         return outputStream;
 

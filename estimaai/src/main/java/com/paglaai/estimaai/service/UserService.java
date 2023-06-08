@@ -4,9 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
+import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
 import com.paglaai.estimaai.exception.UserNotFoundException;
+import com.paglaai.estimaai.mapper.DtoToEntityMapper;
 import com.paglaai.estimaai.repository.UserRepository;
+import com.paglaai.estimaai.repository.UserTeamMemberSurveyRepository;
 import com.paglaai.estimaai.repository.entity.UserEntity;
+import com.paglaai.estimaai.repository.entity.UserTeamMemberSurveyEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
+    private final UserTeamMemberSurveyRepository userTeamMemberSurveyRepository;
 
     public UserDto findUserByEmail(String email) {
 
@@ -48,10 +52,81 @@ public class UserService {
         userProfileWithHistories.setName(userEntity.getName());
         userProfileWithHistories.setEmail(email);
         userProfileWithHistories.setReportHistories(userEntity.getReportHistoryEntities());
-
-        var x = objectMapper.writeValueAsString(userEntity.getReportHistoryEntities().get(0));
+        userProfileWithHistories.setUserTeamMemberSurvey(userEntity.getUserTeamMemberSurveyEntity());
 
         return userProfileWithHistories;
+    }
+
+    public Boolean createOrUpdateUserTeamMemberSurvey(TeamMemberSurveyRequest teamMemberSurveyRequest){
+
+        var email = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userEntity = userRepository.findByEmail(email);
+        if(userEntity == null){
+            throw new UserNotFoundException("No user profile found to set survey");
+        }
+
+
+        if(teamMemberSurveyRequest.getId() == 0 || teamMemberSurveyRequest.getId() == null){
+            var existingSurveyForUser = userTeamMemberSurveyRepository.findByUserEntity_Id(userEntity.getId());
+            if(existingSurveyForUser != null){
+                throw new RuntimeException("can't create team survey. Because survey already exists for user");
+            }
+            var userTeamMemberSurveyEntity =  DtoToEntityMapper.requestToEntityWithoutIdAndUserEntity(teamMemberSurveyRequest);
+            userTeamMemberSurveyEntity.setUserEntity(userEntity);
+            userTeamMemberSurveyRepository.save(userTeamMemberSurveyEntity);
+
+        }else{
+           var surveyEntityOptional = userTeamMemberSurveyRepository.findById(teamMemberSurveyRequest.getId());
+           if(surveyEntityOptional.isEmpty()){
+               throw new RuntimeException("no survey record found to update");
+           }
+
+           var surveyRecord = surveyEntityOptional.get();
+           var userTeamMemberSurveyEntity =  this.requestToEntityForUpdate(surveyRecord, teamMemberSurveyRequest);
+
+            userTeamMemberSurveyRepository.save(userTeamMemberSurveyEntity);
+        }
+
+        return true;
+    }
+
+    private UserTeamMemberSurveyEntity requestToEntityForUpdate(UserTeamMemberSurveyEntity userTeamMemberSurveyEntity, TeamMemberSurveyRequest teamMemberSurveyRequest){
+
+        if(teamMemberSurveyRequest.getTeamExp() != null){
+            userTeamMemberSurveyEntity.setTeamExp(teamMemberSurveyRequest.getTeamExp());
+        }
+        if(teamMemberSurveyRequest.getManagerExp() != null){
+            userTeamMemberSurveyEntity.setManagerExp(teamMemberSurveyRequest.getManagerExp());
+        }
+        if(teamMemberSurveyRequest.getYearEnd() != null){
+            userTeamMemberSurveyEntity.setYearEnd(teamMemberSurveyRequest.getYearEnd());
+        }
+        if(teamMemberSurveyRequest.getLength() != null){
+            userTeamMemberSurveyEntity.setLength(teamMemberSurveyRequest.getLength());
+        }
+        if(teamMemberSurveyRequest.getEffort() != null){
+            userTeamMemberSurveyEntity.setEffort(teamMemberSurveyRequest.getEffort());
+        }
+        if(teamMemberSurveyRequest.getTransactions() != null){
+            userTeamMemberSurveyEntity.setTransactions(teamMemberSurveyRequest.getTransactions());
+        }
+        if(teamMemberSurveyRequest.getEntities() != null){
+            userTeamMemberSurveyEntity.setEntities(teamMemberSurveyRequest.getEntities());
+        }
+        if(teamMemberSurveyRequest.getPointsAdjust() != null){
+            userTeamMemberSurveyEntity.setPointsAdjust(teamMemberSurveyRequest.getPointsAdjust());
+        }
+        if(teamMemberSurveyRequest.getEnvergure() != null){
+            userTeamMemberSurveyEntity.setEntities(teamMemberSurveyRequest.getEnvergure());
+        }
+        if(teamMemberSurveyRequest.getPointsNonAdjust() != null){
+            userTeamMemberSurveyEntity.setPointsNonAdjust(teamMemberSurveyRequest.getPointsNonAdjust());
+        }
+        if(teamMemberSurveyRequest.getLanguage() != null){
+            userTeamMemberSurveyEntity.setLanguage(teamMemberSurveyRequest.getLanguage());
+        }
+
+        return userTeamMemberSurveyEntity;
     }
 
     private UserDto mapToUserDto(UserEntity user){
