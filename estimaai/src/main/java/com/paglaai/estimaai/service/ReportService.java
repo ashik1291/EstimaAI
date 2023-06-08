@@ -24,6 +24,7 @@ import net.sf.dynamicreports.report.exception.DRException;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -100,6 +101,13 @@ public class ReportService {
             report.addSummary(DynamicReports.cmp.subreport(subReport(singleData.getBreakdownDataList(), singleData.getTitle())));
         }
         report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
+
+        var reportHistoryEntity = new ReportHistoryEntity();
+        reportHistoryEntity.setTitle(title.concat(" project estimation"));
+        reportHistoryEntity.setGenerationTime(LocalDateTime.now());
+        reportHistoryEntity.setJsonData(data);
+        reportHistoryEntity.setUsers(userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+        reportHistoryRepository.save(reportHistoryEntity);
 
         return report;
     }

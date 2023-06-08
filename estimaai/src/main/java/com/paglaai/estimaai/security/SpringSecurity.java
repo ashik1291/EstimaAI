@@ -60,12 +60,12 @@ public class SpringSecurity {
 
         httpSecurity.headers().frameOptions().disable();
 
-        //httpSecurity.cors().and().csrf().disable();
+        httpSecurity.csrf().disable();
         //@formatter:off
         httpSecurity.authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                .requestMatchers("/report", "/generate-report","/csv-to-json", "/generate-report-from-json", "process-user-stories").permitAll()
+                .requestMatchers("/report", "/generate-report","/csv-to-json", "/generate-report-from-json", "/process-user-stories").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
