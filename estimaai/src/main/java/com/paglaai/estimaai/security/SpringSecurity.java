@@ -60,7 +60,7 @@ public class SpringSecurity {
 
         httpSecurity.headers().frameOptions().disable();
 
-        httpSecurity.cors().and().csrf().disable();
+        //httpSecurity.cors().and().csrf().disable();
         //@formatter:off
         httpSecurity.authorizeHttpRequests()
                 .requestMatchers("/api/auth/**").permitAll()
