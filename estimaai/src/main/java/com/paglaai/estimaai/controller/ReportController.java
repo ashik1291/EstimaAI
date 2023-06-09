@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paglaai.estimaai.domain.BreakdownData;
 import com.paglaai.estimaai.domain.request.UserStoriesAndTitle;
 import com.paglaai.estimaai.domain.response.ReportData;
+import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
 import com.paglaai.estimaai.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,12 +57,12 @@ public class ReportController {
     }
 
     @PostMapping("/process-user-stories")
-    public ResponseEntity<List<ReportData>> processStories(@RequestBody List<UserStoriesAndTitle> userStoriesAndTitles) {
+    public ResponseEntity<WrapperReportData> processStories(@RequestBody List<UserStoriesAndTitle> userStoriesAndTitles) {
         return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStoriesAndTitles));
     }
 
     @PostMapping("generate-report")
-    public ResponseEntity<byte[]> generateReportFromJson(@RequestBody List<ReportData> reportDataList, @RequestParam String title, @RequestParam String exportType) throws IOException, DRException {
+    public ResponseEntity<byte[]> generateReportFromJson(@RequestBody WrapperReportData reportDataList, @RequestParam(required = false) String title, @RequestParam String exportType) throws IOException, DRException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

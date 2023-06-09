@@ -9,4 +9,5 @@ import java.util.List;
 public class ReportData {
     private String title;
     private List<BreakdownData> breakdownDataList;
+    private long totalTime;
 }
