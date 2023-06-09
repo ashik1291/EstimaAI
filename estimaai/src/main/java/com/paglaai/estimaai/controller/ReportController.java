@@ -6,6 +6,7 @@ import com.paglaai.estimaai.domain.request.UserStoriesAndTitle;
 import com.paglaai.estimaai.domain.response.ReportData;
 import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
+import com.paglaai.estimaai.repository.ReportHistoryRepository;
 import com.paglaai.estimaai.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class ReportController {
 
     private final ReportService jasperReportGenerator;
     private final ObjectMapper objectMapper;
+    private final ReportHistoryRepository reportHistoryRepository;
 
 
     @GetMapping("/generate-report")
@@ -61,7 +63,7 @@ public class ReportController {
         return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStoriesAndTitles));
     }
 
-    @PostMapping("generate-report")
+    @PostMapping("generate-report-data")
     public ResponseEntity<byte[]> generateReportFromJson(@RequestBody WrapperReportData reportDataList, @RequestParam(required = false) String title, @RequestParam String exportType) throws IOException, DRException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -71,6 +73,39 @@ public class ReportController {
                 .concat(".").concat(exportType).toLowerCase();
 
         JasperReportBuilder reportStream = jasperReportGenerator.generateReportWrapper(reportDataList, title);
+
+        HttpHeaders headers = new HttpHeaders();
+
+        if ("PDF".equalsIgnoreCase(exportType)) {
+            reportStream.toPdf(outputStream);
+            headers.setContentType(MediaType.valueOf("application/pdf"));
+            headers.setContentDisposition(ContentDisposition.attachment().filename(reportFileName).build());
+        } else if ("XLSX".equalsIgnoreCase(exportType)) {
+            reportStream.toXlsx(outputStream);
+            headers.setContentType(MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDisposition(ContentDisposition.attachment().filename(reportFileName).build());
+        } else {
+            throw new NoExportTypeFoundException("No export type found");
+        }
+
+        return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
+    }
+
+    @PostMapping("generate-report")
+    public ResponseEntity<byte[]> generateReport(@RequestParam long id, @RequestParam(required = false) String title, @RequestParam String exportType) throws IOException, DRException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        final var reportFileName = title.concat("_").concat(
+                        LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
+                .concat(".").concat(exportType).toLowerCase();
+
+        var data = reportHistoryRepository.findById(id);
+        if(data.isEmpty()){
+            throw new RuntimeException("no report history found to generate report");
+        }
+
+        JasperReportBuilder reportStream = jasperReportGenerator.generateReportWrapper(data.get().getJsonData(), title);
 
         HttpHeaders headers = new HttpHeaders();
 

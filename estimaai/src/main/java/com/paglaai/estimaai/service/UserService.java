@@ -6,6 +6,7 @@ import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
 import com.paglaai.estimaai.domain.response.ReportData;
+import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.mapper.DtoToEntityMapper;
 import com.paglaai.estimaai.repository.ReportHistoryRepository;
@@ -95,7 +96,7 @@ public class UserService {
         return true;
     }
 
-    public Boolean saveProcessedDataForReport(List<ReportData> data, String title){
+    public Boolean saveProcessedDataForReport(WrapperReportData data, String title){
         var reportHistoryEntity = new ReportHistoryEntity();
         reportHistoryEntity.setTitle(title.concat(" Project Estimation"));
         reportHistoryEntity.setGenerationTime(LocalDateTime.now());

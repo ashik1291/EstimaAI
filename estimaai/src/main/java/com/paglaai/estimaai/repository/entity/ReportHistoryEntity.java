@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.paglaai.estimaai.configuration.StartupConfiguration;
 import com.paglaai.estimaai.domain.BreakdownData;
 import com.paglaai.estimaai.domain.response.ReportData;
+import com.paglaai.estimaai.domain.response.WrapperReportData;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,15 +39,15 @@ public class ReportHistoryEntity {
     @ToString.Exclude
     private UserEntity users;
 
-    public List<ReportData> getJsonData() {
+    public WrapperReportData getJsonData() {
         try {
-            var data = StartupConfiguration.objectMapper().readValue(jsonData, ReportData[].class);
+            var data = StartupConfiguration.objectMapper().readValue(jsonData, WrapperReportData.class);
             if (data != null) {
-                return List.of(data);
+                return data;
             }
         } catch (Exception ignored) {
         }
-        return new ArrayList<>();
+        return new WrapperReportData();
     }
 
     public void setJsonData(Object jsonData) {

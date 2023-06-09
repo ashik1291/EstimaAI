@@ -5,6 +5,7 @@ import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
 import com.paglaai.estimaai.domain.response.ReportData;
+import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/save-processed-stories")
-    public ResponseEntity<Boolean> createOrUpdateTeamSurvey(@RequestBody List<ReportData> reportDataList, @RequestParam String title){
+    public ResponseEntity<Boolean> createOrUpdateTeamSurvey(@RequestBody WrapperReportData reportDataList, @RequestParam String title){
         return ResponseEntity.ok(userService.saveProcessedDataForReport(reportDataList, title));
     }
 
