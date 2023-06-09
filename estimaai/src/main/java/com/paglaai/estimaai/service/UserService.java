@@ -5,16 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
+import com.paglaai.estimaai.domain.response.ReportData;
 import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.mapper.DtoToEntityMapper;
+import com.paglaai.estimaai.repository.ReportHistoryRepository;
 import com.paglaai.estimaai.repository.UserRepository;
 import com.paglaai.estimaai.repository.UserTeamMemberSurveyRepository;
+import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
 import com.paglaai.estimaai.repository.entity.UserEntity;
 import com.paglaai.estimaai.repository.entity.UserTeamMemberSurveyEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepository;
     private final UserTeamMemberSurveyRepository userTeamMemberSurveyRepository;
+    private final ReportHistoryRepository reportHistoryRepository;
 
     public UserDto findUserByEmail(String email) {
 
@@ -86,6 +91,17 @@ public class UserService {
 
             userTeamMemberSurveyRepository.save(userTeamMemberSurveyEntity);
         }
+
+        return true;
+    }
+
+    public Boolean saveProcessedDataForReport(List<ReportData> data, String title){
+        var reportHistoryEntity = new ReportHistoryEntity();
+        reportHistoryEntity.setTitle(title.concat(" Project Estimation"));
+        reportHistoryEntity.setGenerationTime(LocalDateTime.now());
+        reportHistoryEntity.setJsonData(data);
+        reportHistoryEntity.setUsers(userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+        reportHistoryRepository.save(reportHistoryEntity);
 
         return true;
     }

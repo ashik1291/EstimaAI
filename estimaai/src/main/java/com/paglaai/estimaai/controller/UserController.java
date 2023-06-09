@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
+import com.paglaai.estimaai.domain.response.ReportData;
 import com.paglaai.estimaai.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +31,11 @@ public class UserController {
     @PostMapping("/team-member-survey")
     public ResponseEntity<Boolean> createOrUpdateTeamSurvey(@RequestBody TeamMemberSurveyRequest teamMemberSurveyRequest){
         return ResponseEntity.ok(userService.createOrUpdateUserTeamMemberSurvey(teamMemberSurveyRequest));
+    }
+
+    @PostMapping("/save-processed-stories")
+    public ResponseEntity<Boolean> createOrUpdateTeamSurvey(@RequestBody List<ReportData> reportDataList, @RequestParam String title){
+        return ResponseEntity.ok(userService.saveProcessedDataForReport(reportDataList, title));
     }
 
 }

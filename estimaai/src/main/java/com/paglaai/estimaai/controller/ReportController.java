@@ -60,18 +60,14 @@ public class ReportController {
         return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStoriesAndTitles));
     }
 
-    @PostMapping("generate-report-from-json")
+    @PostMapping("generate-report")
     public ResponseEntity<byte[]> generateReportFromJson(@RequestBody List<ReportData> reportDataList, @RequestParam String title, @RequestParam String exportType) throws IOException, DRException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        //byte[] reportBytes = new byte[]{};//reportStream.toByteArray();
 
         final var reportFileName = title.concat("_").concat(
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
                 .concat(".").concat(exportType).toLowerCase();
-
-//        List<ReportData> pojoList = objectMapper.readValue(jsonData, new TypeReference<>() {
-//        });
 
         JasperReportBuilder reportStream = jasperReportGenerator.generateReportWrapper(reportDataList, title);
 

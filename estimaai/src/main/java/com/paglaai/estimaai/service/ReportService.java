@@ -102,13 +102,6 @@ public class ReportService {
         }
         report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
 
-        var reportHistoryEntity = new ReportHistoryEntity();
-        reportHistoryEntity.setTitle(title.concat(" project estimation"));
-        reportHistoryEntity.setGenerationTime(LocalDateTime.now());
-        reportHistoryEntity.setJsonData(data);
-        reportHistoryEntity.setUsers(userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
-        reportHistoryRepository.save(reportHistoryEntity);
-
         return report;
     }
 
