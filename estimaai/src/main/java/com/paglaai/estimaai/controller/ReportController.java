@@ -60,7 +60,12 @@ public class ReportController {
 
     JasperReportBuilder reportStream =
         jasperReportGenerator.generateReportWrapper(
-            data.get().getJsonData(), StringUtil.nullToString(title));
+            data.get().getJsonData(),
+            title == null
+                ? data.get().getTitle() == null
+                    ? StringUtil.nullToString(null)
+                    : data.get().getTitle()
+                : "");
 
     HttpHeaders headers = new HttpHeaders();
 
