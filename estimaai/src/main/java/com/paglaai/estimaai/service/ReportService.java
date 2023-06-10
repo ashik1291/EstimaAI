@@ -326,10 +326,12 @@ public class ReportService {
 
 
     public WrapperReportData getProcessedFeatureList(List<UserStoriesAndTitleRequest> userStoriesAndTitleRequests) {
+
         var wrapperReportData = new WrapperReportData();
         var reportDataList = new ArrayList<ReportData>();
         long totalProjectTime = 0;
         List<MlEstimaResponse> mlResponseList = new ArrayList<>();
+
         for(var userStoryAndTitle: userStoriesAndTitleRequests){
             var reportData = new ReportData();
             reportData.setTitle(TitleCaseUtil.convertToTitleCase(userStoryAndTitle.getTitle()));
@@ -339,7 +341,6 @@ public class ReportService {
                 mlResponseList.clear();
                 log.error(ignore.getMessage());
                 continue;
-                
             }
             for(var mlResponse : mlResponseList){
                 var breakDownList = new ArrayList<BreakdownData>();

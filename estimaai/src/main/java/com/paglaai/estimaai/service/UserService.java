@@ -15,6 +15,7 @@ import com.paglaai.estimaai.repository.UserTeamMemberSurveyRepository;
 import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
 import com.paglaai.estimaai.repository.entity.UserEntity;
 import com.paglaai.estimaai.repository.entity.UserTeamMemberSurveyEntity;
+import com.paglaai.estimaai.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -98,13 +99,11 @@ public class UserService {
 
     public Boolean saveProcessedDataForReport(WrapperReportData data, String title){
         var reportHistoryEntity = new ReportHistoryEntity();
-        reportHistoryEntity.setTitle(title.concat(" Project Estimation"));
+        reportHistoryEntity.setTitle(StringUtil.nullToString(title));
         reportHistoryEntity.setGenerationTime(LocalDateTime.now());
         reportHistoryEntity.setJsonData(data);
-        reportHistoryEntity.setUsers(userRepository.findByEmail("ashik.bhuiyan@yopmail.com"));
+        reportHistoryEntity.setUsers(userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
         reportHistoryRepository.save(reportHistoryEntity);
-
-        //SecurityContextHolder.getContext().getAuthentication().getName()
 
         return true;
     }
