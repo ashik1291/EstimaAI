@@ -15,24 +15,24 @@ import lombok.Setter;
 @Table(name = "user_team_member_survey")
 public class UserTeamMemberSurveyEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private long id;
 
-    private float teamExp;
-    private float managerExp;
-    private float yearEnd;
-    private float length;
-    private float effort;
-    private float transactions;
-    private float entities;
-    private float pointsAdjust;
-    private float envergure;
-    private float pointsNonAdjust;
-    private float language;
+  private float teamExp;
+  private float managerExp;
+  private float yearEnd;
+  private float length;
+  private float effort;
+  private float transactions;
+  private float entities;
+  private float pointsAdjust;
+  private float envergure;
+  private float pointsNonAdjust;
+  private float language;
 
-    @OneToOne
-    @JoinColumn(name = "userEntity_id")
-    @JsonIgnore
-    private UserEntity userEntity;
+  @OneToOne
+  @JoinColumn(name = "userEntity_id")
+  @JsonIgnore
+  private UserEntity userEntity;
 }

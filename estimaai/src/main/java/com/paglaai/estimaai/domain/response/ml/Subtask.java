@@ -5,15 +5,15 @@ import lombok.Data;
 
 @Data
 public class Subtask {
-    @JsonProperty("FINT")
-    private String featureIntent;
+  @JsonProperty("FINT")
+  private String featureIntent;
 
-    @JsonProperty("ST")
-    private String subtasksOfFeatures;
+  @JsonProperty("ST")
+  private String subtasksOfFeatures;
 
-    @JsonProperty("IT")
-    private String implementationTime;
+  @JsonProperty("IT")
+  private String implementationTime;
 
-    @JsonProperty("CMPX")
-    private String complexity;
+  @JsonProperty("CMPX")
+  private String complexity;
 }

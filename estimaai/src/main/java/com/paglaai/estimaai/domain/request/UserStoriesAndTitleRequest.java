@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UserStoriesAndTitleRequest {
-    private String userStory;
-    private String title;
+  private String userStory;
+  private String title;
 }

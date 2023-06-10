@@ -16,19 +16,18 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class UserDto {
 
-    @NotEmpty(message = "First name is required")
-    @Size(max = 50, message = "First name length limit is exceeded")
-    private String firstName;
+  @NotEmpty(message = "First name is required")
+  @Size(max = 50, message = "First name length limit is exceeded")
+  private String firstName;
 
-    @Size(max = 50, message = "Last name length limit is exceeded")
-    private String lastName;
+  @Size(max = 50, message = "Last name length limit is exceeded")
+  private String lastName;
 
-    @NotEmpty(message = "Email is required")
-    @Email
-    private String email;
+  @NotEmpty(message = "Email is required")
+  @Email
+  private String email;
 
-    @NotEmpty(message = "Password is required")
-    @Size(max = 50, message = "Password length limit is exceeded")
-    private String password;
-
+  @NotEmpty(message = "Password is required")
+  @Size(max = 50, message = "Password length limit is exceeded")
+  private String password;
 }

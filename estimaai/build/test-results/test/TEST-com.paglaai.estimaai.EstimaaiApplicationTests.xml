@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.paglaai.estimaai.EstimaaiApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-06-08T05:48:12" hostname="BS-909" time="0.455">
+<testsuite name="com.paglaai.estimaai.EstimaaiApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-06-10T19:10:38" hostname="BS-909" time="0.434">
   <properties/>
-  <testcase name="contextLoads()" classname="com.paglaai.estimaai.EstimaaiApplicationTests" time="0.455"/>
-  <system-out><![CDATA[11:48:06.877 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.paglaai.estimaai.EstimaaiApplicationTests]: EstimaaiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-11:48:06.962 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.paglaai.estimaai.EstimaaiApplication for test class com.paglaai.estimaai.EstimaaiApplicationTests
+  <testcase name="contextLoads()" classname="com.paglaai.estimaai.EstimaaiApplicationTests" time="0.434"/>
+  <system-out><![CDATA[01:10:29.931 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.paglaai.estimaai.EstimaaiApplicationTests]: EstimaaiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+01:10:30.028 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.paglaai.estimaai.EstimaaiApplication for test class com.paglaai.estimaai.EstimaaiApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -13,28 +13,29 @@
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::                (v3.1.0)
 
-2023-06-08T11:48:07.562+06:00  INFO 13820 --- [    Test worker] c.p.estimaai.EstimaaiApplicationTests    : Starting EstimaaiApplicationTests using Java 17.0.6 with PID 13820 (started by BS909 in D:\EstimaAI\EstimaAI\estimaai)
-2023-06-08T11:48:07.564+06:00  INFO 13820 --- [    Test worker] c.p.estimaai.EstimaaiApplicationTests    : No active profile set, falling back to 1 default profile: "default"
-2023-06-08T11:48:08.370+06:00  INFO 13820 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2023-06-08T11:48:08.440+06:00  INFO 13820 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 62 ms. Found 4 JPA repository interfaces.
-2023-06-08T11:48:08.662+06:00  INFO 13820 --- [    Test worker] o.s.cloud.context.scope.GenericScope     : BeanFactory id=b9c2baa2-e366-3131-b893-e978bd14e9d5
-2023-06-08T11:48:08.755+06:00  INFO 13820 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'com.paglaai.estimaai.feign.MLFeign' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
-2023-06-08T11:48:08.945+06:00  INFO 13820 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2023-06-08T11:48:09.003+06:00  INFO 13820 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.2.Final
-2023-06-08T11:48:09.006+06:00  INFO 13820 --- [    Test worker] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
-2023-06-08T11:48:09.123+06:00  INFO 13820 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
-2023-06-08T11:48:09.249+06:00  INFO 13820 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2023-06-08T11:48:09.267+06:00  INFO 13820 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2023-06-08T11:48:09.514+06:00  INFO 13820 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@41404aa2
-2023-06-08T11:48:09.516+06:00  INFO 13820 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2023-06-08T11:48:09.563+06:00  INFO 13820 --- [    Test worker] org.hibernate.orm.dialect                : HHH035001: Using dialect: org.hibernate.dialect.MySQLDialect, version: 8.0.33
-2023-06-08T11:48:09.780+06:00  INFO 13820 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
-2023-06-08T11:48:10.322+06:00  INFO 13820 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
-2023-06-08T11:48:10.425+06:00  INFO 13820 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2023-06-08T11:48:11.191+06:00  WARN 13820 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2023-06-08T11:48:12.345+06:00  INFO 13820 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@465a121d, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@23938caa, org.springframework.security.web.context.SecurityContextHolderFilter@44992466, org.springframework.security.web.header.HeaderWriterFilter@24eb71f6, org.springframework.web.filter.CorsFilter@643bef2a, org.springframework.security.web.authentication.logout.LogoutFilter@4b93a232, com.paglaai.estimaai.security.JwtTokenFilter@5e89e527, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@623cd12e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@73136174, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6049b4c9, org.springframework.security.web.session.SessionManagementFilter@796d0b43, org.springframework.security.web.access.ExceptionTranslationFilter@2474331d, org.springframework.security.web.access.intercept.AuthorizationFilter@117e9a56]
-2023-06-08T11:48:12.572+06:00  WARN 13820 --- [    Test worker] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
-2023-06-08T11:48:12.907+06:00  INFO 13820 --- [    Test worker] c.p.estimaai.EstimaaiApplicationTests    : Started EstimaaiApplicationTests in 5.775 seconds (process running for 7.146)
+2023-06-11T01:10:31.677+06:00  INFO 20516 --- [    Test worker] c.p.estimaai.EstimaaiApplicationTests    : Starting EstimaaiApplicationTests using Java 17.0.6 with PID 20516 (started by BS909 in D:\EstimaAI\EstimaAI\estimaai)
+2023-06-11T01:10:31.680+06:00  INFO 20516 --- [    Test worker] c.p.estimaai.EstimaaiApplicationTests    : No active profile set, falling back to 1 default profile: "default"
+2023-06-11T01:10:32.513+06:00  INFO 20516 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2023-06-11T01:10:32.594+06:00  INFO 20516 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 65 ms. Found 4 JPA repository interfaces.
+2023-06-11T01:10:32.824+06:00  INFO 20516 --- [    Test worker] o.s.cloud.context.scope.GenericScope     : BeanFactory id=24923593-858c-31c5-bc62-9891a085e2d1
+2023-06-11T01:10:32.936+06:00  INFO 20516 --- [    Test worker] trationDelegate$BeanPostProcessorChecker : Bean 'com.paglaai.estimaai.feign.MLFeign' of type [org.springframework.cloud.openfeign.FeignClientFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2023-06-11T01:10:33.174+06:00  INFO 20516 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-06-11T01:10:33.236+06:00  INFO 20516 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.2.Final
+2023-06-11T01:10:33.238+06:00  INFO 20516 --- [    Test worker] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2023-06-11T01:10:33.355+06:00  INFO 20516 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-06-11T01:10:33.467+06:00  INFO 20516 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2023-06-11T01:10:33.481+06:00  INFO 20516 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-06-11T01:10:33.750+06:00  INFO 20516 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@620572db
+2023-06-11T01:10:33.751+06:00  INFO 20516 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-06-11T01:10:33.789+06:00  INFO 20516 --- [    Test worker] org.hibernate.orm.dialect                : HHH035001: Using dialect: org.hibernate.dialect.MySQLDialect, version: 8.0.33
+2023-06-11T01:10:34.022+06:00  INFO 20516 --- [    Test worker] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-06-11T01:10:34.603+06:00  INFO 20516 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-06-11T01:10:34.800+06:00  INFO 20516 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-06-11T01:10:35.634+06:00  WARN 20516 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2023-06-11T01:10:36.826+06:00  INFO 20516 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@4d5d6297, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6bd2c51d, org.springframework.security.web.context.SecurityContextHolderFilter@17d5138, org.springframework.security.web.header.HeaderWriterFilter@1f748d43, org.springframework.web.filter.CorsFilter@709c41da, org.springframework.security.web.authentication.logout.LogoutFilter@6e591c03, com.paglaai.estimaai.security.JwtTokenFilter@63bb719d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@18f919ce, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4dea763c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6ca9f1d0, org.springframework.security.web.session.SessionManagementFilter@4ae93e38, org.springframework.security.web.access.ExceptionTranslationFilter@72cf43fa, org.springframework.security.web.access.intercept.AuthorizationFilter@27103726]
+2023-06-11T01:10:37.042+06:00  WARN 20516 --- [    Test worker] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2023-06-11T01:10:38.351+06:00  INFO 20516 --- [    Test worker] o.s.cloud.commons.util.InetUtils         : Cannot determine local hostname
+2023-06-11T01:10:38.415+06:00  INFO 20516 --- [    Test worker] c.p.estimaai.EstimaaiApplicationTests    : Started EstimaaiApplicationTests in 8.228 seconds (process running for 9.387)
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

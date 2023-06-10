@@ -22,110 +22,118 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SpringSecurity {
 
-    private final JwtTokenFilter jwtAuthenticationFilter;
-    private final UserDetailsService userDetailsService;
-    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+  private final JwtTokenFilter jwtAuthenticationFilter;
+  private final UserDetailsService userDetailsService;
+  private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
-    public SpringSecurity(JwtTokenFilter jwtAuthenticationFilter,
-                          UserDetailsService userDetailsService, JwtAuthenticationEntryPoint unauthorizedHandler) {
+  public SpringSecurity(
+      JwtTokenFilter jwtAuthenticationFilter,
+      UserDetailsService userDetailsService,
+      JwtAuthenticationEntryPoint unauthorizedHandler) {
 
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.userDetailsService = userDetailsService;
-        this.unauthorizedHandler = unauthorizedHandler;
-    }
+    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.userDetailsService = userDetailsService;
+    this.unauthorizedHandler = unauthorizedHandler;
+  }
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
+  @Bean
+  public DaoAuthenticationProvider authenticationProvider() {
 
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        return daoAuthenticationProvider;
-    }
+    DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+    daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+    daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+    return daoAuthenticationProvider;
+  }
 
-    /**
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
-    }
-     **/
-    @Bean
-    public static PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
+  /**
+   * @Bean PasswordEncoder passwordEncoder() { return NoOpPasswordEncoder.getInstance(); }
+   */
+  @Bean
+  public static PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+  @Bean
+  AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
 
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+    return authenticationConfiguration.getAuthenticationManager();
+  }
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-//
-//        httpSecurity.headers().frameOptions().disable();
-//
-//        httpSecurity.cors().configurationSource(corsConfigurationSource()).and()
-//                .csrf().disable();
-//        //@formatter:off
-//        httpSecurity.authorizeHttpRequests()
-//                .requestMatchers("/api/auth/**").permitAll()
-//                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-//                .requestMatchers("/report", "/generate-report","/csv-to-json", "/generate-report-from-json", "/process-user-stories").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .exceptionHandling()
-//                .authenticationEntryPoint(
-//                        (request, response, authException)
-//                                -> response.sendError(
-//                                HttpServletResponse.SC_UNAUTHORIZED,
-//                                authException.getLocalizedMessage()
-//                        )
-//                )
-//                .and()
-//                .authenticationProvider(authenticationProvider())
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-//        //@formatter:on
-//        return httpSecurity.build();
-//    }
+  //    @Bean
+  //    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+  //
+  //        httpSecurity.headers().frameOptions().disable();
+  //
+  //        httpSecurity.cors().configurationSource(corsConfigurationSource()).and()
+  //                .csrf().disable();
+  //        //@formatter:off
+  //        httpSecurity.authorizeHttpRequests()
+  //                .requestMatchers("/api/auth/**").permitAll()
+  //                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+  //                .requestMatchers("/report", "/generate-report","/csv-to-json",
+  // "/generate-report-from-json", "/process-user-stories").permitAll()
+  //                .anyRequest().authenticated()
+  //                .and()
+  //                .sessionManagement()
+  //                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+  //                .and()
+  //                .exceptionHandling()
+  //                .authenticationEntryPoint(
+  //                        (request, response, authException)
+  //                                -> response.sendError(
+  //                                HttpServletResponse.SC_UNAUTHORIZED,
+  //                                authException.getLocalizedMessage()
+  //                        )
+  //                )
+  //                .and()
+  //                .authenticationProvider(authenticationProvider())
+  //                .addFilterBefore(jwtAuthenticationFilter,
+  // UsernamePasswordAuthenticationFilter.class);
+  //        //@formatter:on
+  //        return httpSecurity.build();
+  //    }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
-//        httpSecurity.cors().configurationSource(corsConfigurationSource()).and()
-//                .csrf().disable();
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                .cors(httpSecurityCorsConfigurer -> corsConfigurationSource())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                                .requestMatchers("/report", "/generate-report", "/process-user-stories").permitAll()
-                                .anyRequest().authenticated()
-                );
+    //        httpSecurity.cors().configurationSource(corsConfigurationSource()).and()
+    //                .csrf().disable();
+    httpSecurity
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(httpSecurityCorsConfigurer -> corsConfigurationSource())
+        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/api/auth/**")
+                    .permitAll()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**")
+                    .permitAll()
+                    .requestMatchers("/report", "/generate-report", "/process-user-stories")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated());
 
-        httpSecurity.authenticationProvider(authenticationProvider());
+    httpSecurity.authenticationProvider(authenticationProvider());
 
-        httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    httpSecurity.addFilterBefore(
+        jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return httpSecurity.build();
-    }
+    return httpSecurity.build();
+  }
 
-    private CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOriginPattern("*");
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
-        configuration.setAllowCredentials(true);
+  private CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOriginPattern("*");
+    configuration.addAllowedHeader("*");
+    configuration.addAllowedMethod("*");
+    configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", configuration);
 
-        return null;
-    }
+    return null;
+  }
 }
-

@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BreakdownData {
-    private String featureTitle;
-    private String featureIntent;
-    private String subtasksOfFeatures;
-    private String implementationTime;
-    private String complexity;
-    private String kloc;
+  private String featureTitle;
+  private String featureIntent;
+  private String subtasksOfFeatures;
+  private String implementationTime;
+  private String complexity;
+  private String kloc;
 }
