@@ -1,6 +1,6 @@
 package com.paglaai.estimaai.feign;
 
-import com.paglaai.estimaai.domain.request.MLEstimaBody;
+import com.paglaai.estimaai.domain.request.MLEstimaBodyRequest;
 import com.paglaai.estimaai.domain.response.ml.MlEstimaResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +12,6 @@ import java.util.List;
 public interface MLFeign {
 
     @PostMapping(value = "/estima")
-    List<MlEstimaResponse> getFeatures(@RequestBody MLEstimaBody stories);
+    List<MlEstimaResponse> getFeatures(@RequestBody MLEstimaBodyRequest stories);
 
 }

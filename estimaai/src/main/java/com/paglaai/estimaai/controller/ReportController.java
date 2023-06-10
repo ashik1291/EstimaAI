@@ -1,13 +1,12 @@
 package com.paglaai.estimaai.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.paglaai.estimaai.domain.BreakdownData;
-import com.paglaai.estimaai.domain.request.UserStoriesAndTitle;
-import com.paglaai.estimaai.domain.response.ReportData;
+import com.paglaai.estimaai.domain.request.UserStoriesAndTitleRequest;
 import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
 import com.paglaai.estimaai.repository.ReportHistoryRepository;
 import com.paglaai.estimaai.service.ReportService;
+import com.paglaai.estimaai.util.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,11 +58,12 @@ public class ReportController {
     }
 
     @PostMapping("/process-user-stories")
-    public ResponseEntity<WrapperReportData> processStories(@RequestBody List<UserStoriesAndTitle> userStoriesAndTitles) {
-        return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStoriesAndTitles));
+    public ResponseEntity<WrapperReportData> processStories(@RequestBody List<UserStoriesAndTitleRequest> userStoriesAndTitleRequests) {
+        return ResponseEntity.ok(jasperReportGenerator.getProcessedFeatureList(userStoriesAndTitleRequests));
     }
 
     @PostMapping("generate-report-data")
+    @Operation(hidden = true)
     public ResponseEntity<byte[]> generateReportFromJson(@RequestBody WrapperReportData reportDataList, @RequestParam(required = false) String title, @RequestParam String exportType) throws IOException, DRException {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -96,7 +96,7 @@ public class ReportController {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        final var reportFileName = title.concat("_").concat(
+        final var reportFileName = StringUtil.nullToString(title).concat("_").concat(
                         LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
                 .concat(".").concat(exportType).toLowerCase();
 
@@ -105,7 +105,7 @@ public class ReportController {
             throw new RuntimeException("no report history found to generate report");
         }
 
-        JasperReportBuilder reportStream = jasperReportGenerator.generateReportWrapper(data.get().getJsonData(), title);
+        JasperReportBuilder reportStream = jasperReportGenerator.generateReportWrapper(data.get().getJsonData(), StringUtil.nullToString(title));
 
         HttpHeaders headers = new HttpHeaders();
 

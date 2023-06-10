@@ -101,8 +101,10 @@ public class UserService {
         reportHistoryEntity.setTitle(title.concat(" Project Estimation"));
         reportHistoryEntity.setGenerationTime(LocalDateTime.now());
         reportHistoryEntity.setJsonData(data);
-        reportHistoryEntity.setUsers(userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName()));
+        reportHistoryEntity.setUsers(userRepository.findByEmail("ashik.bhuiyan@yopmail.com"));
         reportHistoryRepository.save(reportHistoryEntity);
+
+        //SecurityContextHolder.getContext().getAuthentication().getName()
 
         return true;
     }

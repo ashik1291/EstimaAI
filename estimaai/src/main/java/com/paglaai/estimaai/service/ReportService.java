@@ -5,8 +5,8 @@ import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.paglaai.estimaai.configuration.StartupConfiguration;
 import com.paglaai.estimaai.domain.BreakdownData;
-import com.paglaai.estimaai.domain.request.MLEstimaBody;
-import com.paglaai.estimaai.domain.request.UserStoriesAndTitle;
+import com.paglaai.estimaai.domain.request.MLEstimaBodyRequest;
+import com.paglaai.estimaai.domain.request.UserStoriesAndTitleRequest;
 import com.paglaai.estimaai.domain.response.ReportData;
 import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.domain.response.ml.MlEstimaResponse;
@@ -21,17 +21,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.column.Columns;
-import net.sf.dynamicreports.report.builder.component.Components;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.component.VerticalListBuilder;
-import net.sf.dynamicreports.report.builder.style.StyleBuilder;
 import net.sf.dynamicreports.report.constant.*;
 import net.sf.dynamicreports.report.exception.DRException;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -330,16 +325,16 @@ public class ReportService {
     }
 
 
-    public WrapperReportData getProcessedFeatureList(List<UserStoriesAndTitle> userStoriesAndTitles) {
+    public WrapperReportData getProcessedFeatureList(List<UserStoriesAndTitleRequest> userStoriesAndTitleRequests) {
         var wrapperReportData = new WrapperReportData();
         var reportDataList = new ArrayList<ReportData>();
         long totalProjectTime = 0;
         List<MlEstimaResponse> mlResponseList = new ArrayList<>();
-        for(var userStoryAndTitle: userStoriesAndTitles){
+        for(var userStoryAndTitle: userStoriesAndTitleRequests){
             var reportData = new ReportData();
             reportData.setTitle(TitleCaseUtil.convertToTitleCase(userStoryAndTitle.getTitle()));
             try{
-                mlResponseList =  mlFeign.getFeatures(new MLEstimaBody().setStory(userStoryAndTitle.getUserStory()));
+                mlResponseList =  mlFeign.getFeatures(new MLEstimaBodyRequest().setStory(userStoryAndTitle.getUserStory()));
             }catch (Exception ignore){
                 mlResponseList.clear();
                 log.error(ignore.getMessage());

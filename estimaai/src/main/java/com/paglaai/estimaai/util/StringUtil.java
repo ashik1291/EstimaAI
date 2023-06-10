@@ -29,4 +29,8 @@ public class StringUtil {
             return null;
         }
     }
+
+    public static String nullToString(String param){
+        return param == null ? "Project Estimation":TitleCaseUtil.convertToTitleCase(param);
+    }
 }
