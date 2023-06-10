@@ -4,9 +4,6 @@
 # Ignore temporary files
 temp/
 
-# Ignore dependencies
-node_modules/
-
 HELP.md
 .gradle
 build/
