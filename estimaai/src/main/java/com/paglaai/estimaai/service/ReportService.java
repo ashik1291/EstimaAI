@@ -288,7 +288,7 @@ public class ReportService {
         var subStoryTime = getTotalTime(breakDownList);
         reportData.setTotalTime(subStoryTime);
 
-        totalProjectTime += subStoryTime;
+        totalProjectTime = totalProjectTime + subStoryTime;
       }
       reportDataList.add(reportData);
       mlResponseList.clear();
