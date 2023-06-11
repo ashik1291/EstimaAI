@@ -62,7 +62,8 @@ public class ReportController {
         jasperReportGenerator.generateReportWrapper(
             data.get().getJsonData(),
             title != null
-                ? title : data.get().getTitle() == null
+                ? title
+                : data.get().getTitle() == null
                     ? StringUtil.nullToTitleString(null)
                     : data.get().getTitle());
 
