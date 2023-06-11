@@ -96,9 +96,9 @@ public class UserService {
     return true;
   }
 
-  public Boolean saveProcessedDataForReport(WrapperReportData data, String title) {
+  public Boolean saveProcessedStoryToUserProfile(WrapperReportData data, String title) {
     var reportHistoryEntity = new ReportHistoryEntity();
-    reportHistoryEntity.setTitle(StringUtil.nullToString(title));
+    reportHistoryEntity.setTitle(StringUtil.nullToTitleString(title));
     reportHistoryEntity.setGenerationTime(LocalDateTime.now());
     reportHistoryEntity.setJsonData(data);
     reportHistoryEntity.setUsers(

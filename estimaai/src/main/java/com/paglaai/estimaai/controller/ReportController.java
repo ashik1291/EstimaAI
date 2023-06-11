@@ -45,7 +45,7 @@ public class ReportController {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     final var reportFileName =
-        StringUtil.nullToString(title)
+        StringUtil.nullToTitleString(title)
             .concat("_")
             .concat(
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mmssSSS")))
@@ -63,7 +63,7 @@ public class ReportController {
             data.get().getJsonData(),
             title == null
                 ? data.get().getTitle() == null
-                    ? StringUtil.nullToString(null)
+                    ? StringUtil.nullToTitleString(null)
                     : data.get().getTitle()
                 : "");
 

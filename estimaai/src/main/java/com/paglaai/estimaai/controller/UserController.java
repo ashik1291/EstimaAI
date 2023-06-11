@@ -28,15 +28,15 @@ public class UserController {
   }
 
   @PostMapping("/team-member-survey")
-  public ResponseEntity<Boolean> createOrUpdateTeamSurvey(
+  public ResponseEntity<Boolean> saveProcessStoryToUserProfile(
       @RequestBody TeamMemberSurveyRequest teamMemberSurveyRequest) {
     return ResponseEntity.ok(
         userService.createOrUpdateUserTeamMemberSurvey(teamMemberSurveyRequest));
   }
 
   @PostMapping("/save-processed-stories")
-  public ResponseEntity<Boolean> createOrUpdateTeamSurvey(
+  public ResponseEntity<Boolean> saveProcessStoryToUserProfile(
       @RequestBody WrapperReportData reportDataList, @RequestParam String title) {
-    return ResponseEntity.ok(userService.saveProcessedDataForReport(reportDataList, title));
+    return ResponseEntity.ok(userService.saveProcessedStoryToUserProfile(reportDataList, title));
   }
 }
