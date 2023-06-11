@@ -36,6 +36,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<String> handleBadCredentialsException(RuntimeException ex) {
+    ex.printStackTrace();
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 
