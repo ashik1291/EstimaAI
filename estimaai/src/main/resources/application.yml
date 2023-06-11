@@ -18,7 +18,7 @@ spring:
       client:
         config:
           mlService:
-            url: 'http://192.168.217.173:5000'
+            url: 'http://192.168.217.158:5000'
             connectTimeout: 60000
             readTimeout: 60000
             loggerLevel: full

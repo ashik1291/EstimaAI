@@ -25,7 +25,7 @@ public class SpringSecurity {
 
   private final JwtTokenFilter jwtAuthenticationFilter;
   private final UserDetailsService userDetailsService;
-  private final JwtAuthenticationEntryPoint unauthorizedHandler;
+  //private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
   public SpringSecurity(
       JwtTokenFilter jwtAuthenticationFilter,
@@ -34,7 +34,7 @@ public class SpringSecurity {
 
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     this.userDetailsService = userDetailsService;
-    this.unauthorizedHandler = unauthorizedHandler;
+    //this.unauthorizedHandler = unauthorizedHandler;
   }
 
   @Bean
@@ -135,6 +135,6 @@ public class SpringSecurity {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
 
-    return null;
+    return source;
   }
 }

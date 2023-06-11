@@ -8,15 +8,19 @@ import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.domain.response.ml.MlEstimaResponse;
 import com.paglaai.estimaai.feign.MLFeign;
 import com.paglaai.estimaai.util.TitleCaseUtil;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
+import net.sf.dynamicreports.report.builder.component.Components;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.component.VerticalListBuilder;
+import net.sf.dynamicreports.report.builder.expression.Expressions;
 import net.sf.dynamicreports.report.constant.*;
 import org.springframework.stereotype.Service;
 
@@ -25,500 +29,492 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ReportService {
 
-  private final MLFeign mlFeign;
+    private final MLFeign mlFeign;
 
-  public JasperReportBuilder generateReportWrapper(WrapperReportData data, String title) {
+    public JasperReportBuilder generateReportWrapper(WrapperReportData data, String title) {
 
-    JasperReportBuilder report = DynamicReports.report();
+        JasperReportBuilder report = DynamicReports.report();
 
-    // Create space elements
-    VerticalListBuilder spaceBefore = DynamicReports.cmp.verticalList().setFixedHeight(20);
-    VerticalListBuilder spaceAfter = DynamicReports.cmp.verticalList().setFixedHeight(10);
+        // Create space elements
+        VerticalListBuilder spaceBefore = DynamicReports.cmp.verticalList().setFixedHeight(10);
+        VerticalListBuilder spaceAfter = DynamicReports.cmp.verticalList().setFixedHeight(6);
 
-    // Header 1
-    final TextFieldBuilder<String> header1 =
-        DynamicReports.cmp
-            .text("Paglaa AI Inc. ")
-            .setFixedHeight(12)
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setBold(true)
-                    .setFontSize(16)
-                    .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                    .setForegroundColor(Color.BLACK));
-    // Header 2
-    final TextFieldBuilder<String> header2 =
-        DynamicReports.cmp
-            .text(title)
-            .setFixedHeight(12)
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setFontSize(13)
-                    .setHorizontalAlignment(HorizontalAlignment.CENTER));
-
-    // Page Header
-    report.pageHeader(
-        DynamicReports.cmp.verticalGap(5),
-        DynamicReports.cmp.verticalList(
-            DynamicReports.cmp.verticalList(header1).setGap(5).add(spaceAfter),
-            DynamicReports.cmp.horizontalFlowList(header2),
-            DynamicReports.cmp.verticalGap(10)));
-
-    // Configuration when data splits into other pages
-    report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
-    report.setDetailSplitType(SplitType.PREVENT);
-    report.highlightDetailEvenRows();
-
-    // Page Margin
-    report.setPageMargin(DynamicReports.margin().setLeft(10).setRight(10).setTop(8).setBottom(10));
-
-    if (data.getReportDataList().isEmpty()) {
-      report.setWhenNoDataType(WhenNoDataType.ALL_SECTIONS_NO_DETAIL);
-    }
-
-    for (var singleData : data.getReportDataList()) {
-      report.addSummary(
-          DynamicReports.cmp.subreport(
-              subReport(
-                  singleData.getBreakdownDataList(),
-                  singleData.getTitle(),
-                  singleData.getTotalTime())));
-    }
-    report.addSummary(
-        DynamicReports.cmp.subreport(
-            DynamicReports.report()
-                .pageFooter(
-                    DynamicReports.cmp
-                        .text(
-                            "Total Project Implementation Time: "
-                                .concat(String.valueOf(data.getTotalTime())))
+        // Header 1
+        final TextFieldBuilder<String> header1 =
+                DynamicReports.cmp
+                        .text("Paglaa AI Inc. ")
+                        .setFixedHeight(12)
                         .setStyle(
-                            DynamicReports.stl
-                                .style()
-                                .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                                .setFontSize(10)
-                                .bold()
-                                .setRightPadding(15)
-                                .setTopPadding(10)))));
-    report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
+                                DynamicReports.stl
+                                        .style()
+                                        .setBold(true)
+                                        .setFontSize(16)
+                                        .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                                        .setForegroundColor(Color.BLACK));
+        // Header 2
+        final TextFieldBuilder<String> header2 =
+                DynamicReports.cmp
+                        .text(title)
+                        .setFixedHeight(12)
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setFontSize(13)
+                                        .setHorizontalAlignment(HorizontalAlignment.CENTER));
 
-    return report;
-  }
+        // Page Header
+        report.pageHeader(
+                DynamicReports.cmp.verticalGap(5),
+                DynamicReports.cmp.verticalList(
+                        DynamicReports.cmp.verticalList(header1).setGap(10),
+                        DynamicReports.cmp.horizontalFlowList(header2),
+                        DynamicReports.cmp.verticalGap(2)));
 
-  public JasperReportBuilder subReport(List<BreakdownData> data, String title, long totalTime) {
+        // Configuration when data splits into other pages
+        report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
+        report.setDetailSplitType(SplitType.PREVENT);
+        report.highlightDetailEvenRows();
 
-    JasperReportBuilder report = DynamicReports.report();
+        // Page Margin
+        report.setPageMargin(DynamicReports.margin().setLeft(15).setRight(15).setTop(10).setBottom(40));
+        report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
 
-    // Create space elements
-    VerticalListBuilder spaceBefore = DynamicReports.cmp.verticalList().setFixedHeight(20);
-    VerticalListBuilder spaceAfter = DynamicReports.cmp.verticalList().setFixedHeight(10);
-
-    // Header 2
-    final TextFieldBuilder<String> header2 =
-        DynamicReports.cmp
-            .text(title)
-            .setFixedHeight(12)
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setFontSize(13)
-                    .setHorizontalAlignment(HorizontalAlignment.CENTER));
-
-    // Page Header
-    report.pageHeader(
-        DynamicReports.cmp.verticalGap(5),
-        DynamicReports.cmp.horizontalFlowList(header2),
-        DynamicReports.cmp.verticalGap(10));
-
-    // Columns
-    report.addColumn(
-        DynamicReports.col
-            .column("Feature Title", "featureTitle", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(90));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Feature Intent", "featureIntent", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(120));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Subtasks of Features", "subtasksOfFeatures", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(120));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Complexity (1-5)", "complexity", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(90));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Duration (hours)", "implementationTime", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(80));
-
-    // Column Header
-    report.setColumnHeaderStyle(
-        DynamicReports.stl
-            .style()
-            .setRightPadding(5)
-            .setLeftPadding(5)
-            .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE));
-    report.setColumnTitleStyle(
-        DynamicReports.stl
-            .style(DynamicReports.stl.style().bold())
-            .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-            .setBorder(DynamicReports.stl.pen1Point())
-            .setLeftPadding(5)
-            .setRightPadding(5)
-            .setBottomPadding(5)
-            .setTopPadding(5)
-            .setBackgroundColor(Color.decode("#317773"))
-            .bold()
-            .setForegroundColor(Color.WHITE)
-            .setBorder(DynamicReports.stl.penThin().setLineColor(Color.BLACK)));
-
-    // Configuration when data splits into other pages
-    report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
-    report.setDetailSplitType(SplitType.PREVENT);
-    report.highlightDetailEvenRows();
-
-    if (data.isEmpty()) {
-      report.setWhenNoDataType(WhenNoDataType.ALL_SECTIONS_NO_DETAIL);
-    }
-
-    report.setDataSource(data);
-    report.pageFooter(
-        DynamicReports.cmp
-            .text("Total Time: ".concat(String.valueOf(totalTime)))
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setHorizontalAlignment(HorizontalAlignment.RIGHT)
-                    .setFontSize(10)
-                    .bold()
-                    .setRightPadding(12)
-                    .setBottomPadding(5)));
-
-    return report;
-  }
-
-  public WrapperReportData getProcessedFeatureList(
-      List<UserStoriesAndTitleRequest> userStoriesAndTitleRequests) {
-
-    var wrapperReportData = new WrapperReportData();
-    var reportDataList = new ArrayList<ReportData>();
-    long totalProjectTime = 0;
-    List<MlEstimaResponse> mlResponseList = new ArrayList<>();
-
-    for (var userStoryAndTitle : userStoriesAndTitleRequests) {
-      var reportData = new ReportData();
-      reportData.setTitle(TitleCaseUtil.convertToTitleCase(userStoryAndTitle.getTitle()));
-      try {
-        mlResponseList =
-            mlFeign.getFeatures(
-                new MLEstimaBodyRequest().setStory(userStoryAndTitle.getUserStory()));
-      } catch (Exception ignore) {
-        mlResponseList.clear();
-        log.error(ignore.getMessage());
-        continue;
-      }
-      for (var mlResponse : mlResponseList) {
-        var breakDownList = new ArrayList<BreakdownData>();
-        var subTask = mlResponse.getSubtasks();
-        for (var sub : subTask) {
-          var breakdownData = new BreakdownData();
-          breakdownData.setFeatureTitle(mlResponse.getFeatureTitle());
-          breakdownData.setSubtasksOfFeatures(sub.getSubtasksOfFeatures());
-          breakdownData.setFeatureIntent(sub.getFeatureIntent());
-          breakdownData.setImplementationTime(sub.getImplementationTime());
-          breakdownData.setComplexity(sub.getComplexity());
-          breakDownList.add(breakdownData);
+        if (data.getReportDataList().isEmpty()) {
+            report.setWhenNoDataType(WhenNoDataType.ALL_SECTIONS_NO_DETAIL);
         }
 
-        var postProcessedData = postProcessedData(breakDownList);
-        reportData.setBreakdownDataList(postProcessedData);
+        for (var singleData : data.getReportDataList()) {
+            report.addSummary(
+                    DynamicReports.cmp.subreport(
+                            subReport(
+                                    singleData.getBreakdownDataList(),
+                                    singleData.getTitle(),
+                                    singleData.getTotalTime())));
+        }
+        report.addSummary(
+                DynamicReports.cmp.subreport(
+                        DynamicReports.report()
+                                .pageFooter(
+                                        DynamicReports.cmp
+                                                .text(
+                                                        "Total Project Implementation Time: "
+                                                                .concat(String.valueOf(data.getTotalTime())))
+                                                .setStyle(
+                                                        DynamicReports.stl
+                                                                .style()
+                                                                .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                                                                .setFontSize(10)
+                                                                .bold()
+                                                                //.setRightPadding(15)
+                                                                .setTopPadding(20)))));
 
-        var subStoryTime = getTotalTime(breakDownList);
-        reportData.setTotalTime(subStoryTime);
-
-        totalProjectTime = totalProjectTime + subStoryTime;
-      }
-      reportDataList.add(reportData);
-      mlResponseList.clear();
-    }
-    wrapperReportData.setReportDataList(reportDataList);
-    wrapperReportData.setTotalTime(totalProjectTime);
-    return wrapperReportData;
-  }
-
-  private List<BreakdownData> postProcessedData(List<BreakdownData> pojoList) {
-    List<BreakdownData> modifiedList = new ArrayList<>();
-    modifiedList.add(pojoList.get(0));
-    String currentFeatureTitle = pojoList.get(0).getFeatureTitle();
-    String currentFeatureIntent = pojoList.get(0).getFeatureIntent();
-    for (int i = 1; i < pojoList.size(); i++) {
-      var currentPojo = pojoList.get(i);
-      if (currentPojo.getFeatureTitle() != null
-          && currentPojo.getFeatureTitle().equalsIgnoreCase(currentFeatureTitle)) {
-        currentPojo.setFeatureTitle(null);
-      } else {
-        currentFeatureTitle = currentPojo.getFeatureTitle();
-      }
-      if (currentPojo.getFeatureIntent() != null
-          && currentPojo.getFeatureIntent().equalsIgnoreCase(currentFeatureIntent)) {
-        currentPojo.setFeatureIntent(null);
-      } else {
-        currentFeatureIntent = currentPojo.getFeatureIntent();
-      }
-
-      modifiedList.add(currentPojo);
-    }
-    return modifiedList;
-  }
-
-  private long getTotalTime(List<BreakdownData> pojoList) {
-    long count = 0;
-
-    for (var pojo : pojoList) {
-      count += Long.parseLong(pojo.getImplementationTime());
+        return report;
     }
 
-    return count;
-  }
+    public JasperReportBuilder subReport(List<BreakdownData> data, String title, long totalTime) {
 
-  /** Method for Backup */
-  public JasperReportBuilder generateReport(List<BreakdownData> data, String titleOfProject) {
+        JasperReportBuilder report = DynamicReports.report();
 
-    JasperReportBuilder report = DynamicReports.report();
+        // Create space elements
+        VerticalListBuilder spaceBefore = DynamicReports.cmp.verticalList().setFixedHeight(20);
+        VerticalListBuilder spaceAfter = DynamicReports.cmp.verticalList().setFixedHeight(10);
 
-    // Create space elements
-    VerticalListBuilder spaceBefore = DynamicReports.cmp.verticalList().setFixedHeight(20);
-    VerticalListBuilder spaceAfter = DynamicReports.cmp.verticalList().setFixedHeight(10);
+        // Header 2
+        final TextFieldBuilder<String> header2 =
+                DynamicReports.cmp
+                        .text(title)
+                        .setFixedHeight(12)
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setFontSize(13)
+                                        .setHorizontalAlignment(HorizontalAlignment.CENTER));
 
-    // Header 1
-    final TextFieldBuilder<String> header1 =
-        DynamicReports.cmp
-            .text("Paglaa AI Inc. ")
-            .setFixedHeight(12)
-            .setStyle(
+        // Page Header
+        report.pageHeader(
+                DynamicReports.cmp.verticalGap(15),
+                DynamicReports.cmp.horizontalFlowList(header2),
+                DynamicReports.cmp.verticalGap(10));
+
+        // Columns
+        report.addColumn(
+                DynamicReports.col
+                        .column("Feature Title", "featureTitle", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(90));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Feature Intent", "featureIntent", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(120));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Subtasks of Feature", "subtasksOfFeatures", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(120));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Complexity (1-5)", "complexity", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(90));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Duration (hours)", "implementationTime", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(80));
+
+        // Column Header
+        report.setColumnHeaderStyle(
                 DynamicReports.stl
-                    .style()
-                    .setBold(true)
-                    .setFontSize(16)
-                    .setHorizontalAlignment(HorizontalAlignment.CENTER)
-                    .setForegroundColor(Color.BLACK));
-    // Header 2
-    final TextFieldBuilder<String> header2 =
-        DynamicReports.cmp
-            .text(TitleCaseUtil.convertToTitleCase(titleOfProject))
-            .setFixedHeight(12)
-            .setStyle(
+                        .style()
+                        .setRightPadding(5)
+                        .setLeftPadding(5)
+                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE));
+        report.setColumnTitleStyle(
                 DynamicReports.stl
-                    .style()
-                    .setFontSize(13)
-                    .setHorizontalAlignment(HorizontalAlignment.CENTER));
+                        .style(DynamicReports.stl.style().bold())
+                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                        .setBorder(DynamicReports.stl.pen1Point())
+                        .setLeftPadding(5)
+                        .setRightPadding(5)
+                        .setBottomPadding(5)
+                        .setTopPadding(5)
+                        .setBackgroundColor(Color.decode("#317773"))
+                        .bold()
+                        .setForegroundColor(Color.WHITE)
+                        .setBorder(DynamicReports.stl.penThin().setLineColor(Color.BLACK)));
 
-    // Page Header
-    report.pageHeader(
-        DynamicReports.cmp.verticalGap(5),
-        DynamicReports.cmp.verticalList(
-            DynamicReports.cmp.verticalList(header1).setGap(5).add(spaceAfter),
-            DynamicReports.cmp.horizontalFlowList(header2),
-            DynamicReports.cmp.verticalGap(10)));
+        // Configuration when data splits into other pages
+        report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
+        report.setDetailSplitType(SplitType.PREVENT);
+        report.highlightDetailEvenRows();
 
-    // Footer 1
-    final TextFieldBuilder<String> footer1 =
-        DynamicReports.cmp
-            .text("Notes:")
-            .setFixedHeight(12)
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setFontSize(12)
-                    .setBold(true)
-                    .setHorizontalAlignment(HorizontalAlignment.LEFT));
-    // Footer 2
-    final TextFieldBuilder<String> footer2 =
-        DynamicReports.cmp
-            .text("* This report is provided by EstimaAI.")
-            .setFixedHeight(12)
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setFontSize(9)
-                    .setHorizontalAlignment(HorizontalAlignment.LEFT));
+        if (data.isEmpty()) {
+            report.setWhenNoDataType(WhenNoDataType.ALL_SECTIONS_NO_DETAIL);
+        }
 
-    // Page Footer
-    report.pageFooter(
-        DynamicReports.cmp.verticalGap(10),
-        DynamicReports.cmp.verticalList(
-            DynamicReports.cmp.verticalList(footer1).setGap(10),
-            DynamicReports.cmp.horizontalFlowList(footer2)),
-        DynamicReports.cmp.pageXofY());
+        data.add(new BreakdownData().setImplementationTime("Total Time: ".concat(String.valueOf(totalTime))));
+        report.setDataSource(data);
 
-    // Columns
-    report.addColumn(
-        DynamicReports.col
-            .column("Feature Title", "featureTitle", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(90));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Feature Intent", "featureIntent", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(120));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Subtasks of Features", "subtasksOfFeatures", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(120));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Duration (hours)", "implementationTime", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(80));
-
-    report.addColumn(
-        DynamicReports.col
-            .column("Complexity (1-5)", "complexity", DynamicReports.type.stringType())
-            .setStyle(
-                DynamicReports.stl
-                    .style()
-                    .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-                    .setBottomPadding(5)
-                    .setLeftPadding(5)
-                    .setRightPadding(5)
-                    .setTopPadding(5)
-                    .setBorder(DynamicReports.stl.penThin()))
-            .setWidth(90));
-    //        report.addColumn(
-    //                DynamicReports.col.column("KLOC", "kloc", DynamicReports.type.stringType())
-    //                        .setStyle(DynamicReports.stl.style()
-    //                                .setTextAlignment(HorizontalTextAlignment.CENTER,
-    // VerticalTextAlignment.MIDDLE)
-    //
-    // .setBottomPadding(5).setLeftPadding(5).setRightPadding(5).setTopPadding(5)
-    //                                .setBorder(DynamicReports.stl.penThin()))
-    //                        .setWidth(70));
-
-    // Column Header
-    report.setColumnHeaderStyle(
-        DynamicReports.stl
-            .style()
-            .setRightPadding(5)
-            .setLeftPadding(5)
-            .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE));
-    report.setColumnTitleStyle(
-        DynamicReports.stl
-            .style(DynamicReports.stl.style().bold())
-            .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
-            .setBorder(DynamicReports.stl.pen1Point())
-            .setLeftPadding(5)
-            .setRightPadding(5)
-            .setBottomPadding(5)
-            .setTopPadding(5)
-            .setBackgroundColor(Color.decode("#317773"))
-            .bold()
-            .setForegroundColor(Color.WHITE)
-            .setBorder(DynamicReports.stl.penThin().setLineColor(Color.BLACK)));
-
-    // Configuration when data splits into other pages
-    report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
-    report.setDetailSplitType(SplitType.PREVENT);
-    report.highlightDetailEvenRows();
-
-    // Page Margin
-    report.setPageMargin(DynamicReports.margin().setLeft(13).setRight(13).setTop(8).setBottom(12));
-
-    if (data.isEmpty()) {
-      report.setWhenNoDataType(WhenNoDataType.ALL_SECTIONS_NO_DETAIL);
+        return report;
     }
 
-    report.setDataSource(data);
-    report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
+    public WrapperReportData getProcessedFeatureList(
+            List<UserStoriesAndTitleRequest> userStoriesAndTitleRequests) {
 
-    return report;
-  }
+        var wrapperReportData = new WrapperReportData();
+        var reportDataList = new ArrayList<ReportData>();
+        long totalProjectTime = 0;
+        List<MlEstimaResponse> mlResponseList = new ArrayList<>();
+
+        for (var userStoryAndTitle : userStoriesAndTitleRequests) {
+            var reportData = new ReportData();
+            reportData.setTitle(TitleCaseUtil.convertToTitleCase(userStoryAndTitle.getTitle()));
+            try {
+                mlResponseList =
+                        mlFeign.getFeatures(
+                                new MLEstimaBodyRequest().setStory(userStoryAndTitle.getUserStory()));
+            } catch (Exception ignore) {
+                mlResponseList.clear();
+                log.error(ignore.getMessage());
+                continue;
+            }
+            for (var mlResponse : mlResponseList) {
+                var breakDownList = new ArrayList<BreakdownData>();
+                var subTask = mlResponse.getSubtasks();
+                for (var sub : subTask) {
+                    var breakdownData = new BreakdownData();
+                    breakdownData.setFeatureTitle(mlResponse.getFeatureTitle());
+                    breakdownData.setSubtasksOfFeatures(sub.getSubtasksOfFeatures());
+                    breakdownData.setFeatureIntent(sub.getFeatureIntent());
+                    breakdownData.setImplementationTime(sub.getImplementationTime());
+                    breakdownData.setComplexity(sub.getComplexity());
+                    breakDownList.add(breakdownData);
+                }
+
+                var postProcessedData = postProcessedData(breakDownList);
+                reportData.setBreakdownDataList(postProcessedData);
+
+                var subStoryTime = getTotalTime(breakDownList);
+                reportData.setTotalTime(subStoryTime);
+
+                totalProjectTime = totalProjectTime + subStoryTime;
+            }
+            reportDataList.add(reportData);
+            mlResponseList.clear();
+        }
+        wrapperReportData.setReportDataList(reportDataList);
+        wrapperReportData.setTotalTime(totalProjectTime);
+        return wrapperReportData;
+    }
+
+    private List<BreakdownData> postProcessedData(List<BreakdownData> pojoList) {
+        List<BreakdownData> modifiedList = new ArrayList<>();
+        modifiedList.add(pojoList.get(0));
+        String currentFeatureTitle = pojoList.get(0).getFeatureTitle();
+        String currentFeatureIntent = pojoList.get(0).getFeatureIntent();
+        for (int i = 1; i < pojoList.size(); i++) {
+            var currentPojo = pojoList.get(i);
+            if (currentPojo.getFeatureTitle() != null
+                    && currentPojo.getFeatureTitle().equalsIgnoreCase(currentFeatureTitle)) {
+                currentPojo.setFeatureTitle("");
+            } else {
+                currentFeatureTitle = currentPojo.getFeatureTitle();
+            }
+            if (currentPojo.getFeatureIntent() != null
+                    && currentPojo.getFeatureIntent().equalsIgnoreCase(currentFeatureIntent)) {
+                currentPojo.setFeatureIntent("");
+            } else {
+                currentFeatureIntent = currentPojo.getFeatureIntent();
+            }
+
+            modifiedList.add(currentPojo);
+        }
+        return modifiedList;
+    }
+
+    private long getTotalTime(List<BreakdownData> pojoList) {
+        long count = 0;
+
+        for (var pojo : pojoList) {
+            count += Long.parseLong(pojo.getImplementationTime());
+        }
+
+        return count;
+    }
+
+    /**
+     * Method for Backup
+     */
+    public JasperReportBuilder generateReport(List<BreakdownData> data, String titleOfProject) {
+
+        JasperReportBuilder report = DynamicReports.report();
+
+        // Create space elements
+        VerticalListBuilder spaceBefore = DynamicReports.cmp.verticalList().setFixedHeight(20);
+        VerticalListBuilder spaceAfter = DynamicReports.cmp.verticalList().setFixedHeight(10);
+
+        // Header 1
+        final TextFieldBuilder<String> header1 =
+                DynamicReports.cmp
+                        .text("Paglaa AI Inc. ")
+                        .setFixedHeight(12)
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setBold(true)
+                                        .setFontSize(16)
+                                        .setHorizontalAlignment(HorizontalAlignment.CENTER)
+                                        .setForegroundColor(Color.BLACK));
+        // Header 2
+        final TextFieldBuilder<String> header2 =
+                DynamicReports.cmp
+                        .text(TitleCaseUtil.convertToTitleCase(titleOfProject))
+                        .setFixedHeight(12)
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setFontSize(13)
+                                        .setHorizontalAlignment(HorizontalAlignment.CENTER));
+
+        // Page Header
+        report.pageHeader(
+                DynamicReports.cmp.verticalGap(5),
+                DynamicReports.cmp.verticalList(
+                        DynamicReports.cmp.verticalList(header1).setGap(5).add(spaceAfter),
+                        DynamicReports.cmp.horizontalFlowList(header2),
+                        DynamicReports.cmp.verticalGap(10)));
+
+        // Footer 1
+        final TextFieldBuilder<String> footer1 =
+                DynamicReports.cmp
+                        .text("Notes:")
+                        .setFixedHeight(12)
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setFontSize(12)
+                                        .setBold(true)
+                                        .setHorizontalAlignment(HorizontalAlignment.LEFT));
+        // Footer 2
+        final TextFieldBuilder<String> footer2 =
+                DynamicReports.cmp
+                        .text("* This report is provided by EstimaAI.")
+                        .setFixedHeight(12)
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setFontSize(9)
+                                        .setHorizontalAlignment(HorizontalAlignment.LEFT));
+
+        // Page Footer
+        report.pageFooter(
+                DynamicReports.cmp.verticalGap(10),
+                DynamicReports.cmp.verticalList(
+                        DynamicReports.cmp.verticalList(footer1).setGap(10),
+                        DynamicReports.cmp.horizontalFlowList(footer2)),
+                DynamicReports.cmp.pageXofY());
+
+        // Columns
+        report.addColumn(
+                DynamicReports.col
+                        .column("Feature Title", "featureTitle", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(90));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Feature Intent", "featureIntent", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(120));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Subtasks of Features", "subtasksOfFeatures", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(120));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Duration (hours)", "implementationTime", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(80));
+
+        report.addColumn(
+                DynamicReports.col
+                        .column("Complexity (1-5)", "complexity", DynamicReports.type.stringType())
+                        .setStyle(
+                                DynamicReports.stl
+                                        .style()
+                                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                                        .setBottomPadding(5)
+                                        .setLeftPadding(5)
+                                        .setRightPadding(5)
+                                        .setTopPadding(5)
+                                        .setBorder(DynamicReports.stl.penThin()))
+                        .setWidth(90));
+        //        report.addColumn(
+        //                DynamicReports.col.column("KLOC", "kloc", DynamicReports.type.stringType())
+        //                        .setStyle(DynamicReports.stl.style()
+        //                                .setTextAlignment(HorizontalTextAlignment.CENTER,
+        // VerticalTextAlignment.MIDDLE)
+        //
+        // .setBottomPadding(5).setLeftPadding(5).setRightPadding(5).setTopPadding(5)
+        //                                .setBorder(DynamicReports.stl.penThin()))
+        //                        .setWidth(70));
+
+        // Column Header
+        report.setColumnHeaderStyle(
+                DynamicReports.stl
+                        .style()
+                        .setRightPadding(5)
+                        .setLeftPadding(5)
+                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE));
+        report.setColumnTitleStyle(
+                DynamicReports.stl
+                        .style(DynamicReports.stl.style().bold())
+                        .setTextAlignment(HorizontalTextAlignment.CENTER, VerticalTextAlignment.MIDDLE)
+                        .setBorder(DynamicReports.stl.pen1Point())
+                        .setLeftPadding(5)
+                        .setRightPadding(5)
+                        .setBottomPadding(5)
+                        .setTopPadding(5)
+                        .setBackgroundColor(Color.decode("#317773"))
+                        .bold()
+                        .setForegroundColor(Color.WHITE)
+                        .setBorder(DynamicReports.stl.penThin().setLineColor(Color.BLACK)));
+
+        // Configuration when data splits into other pages
+        report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
+        report.setDetailSplitType(SplitType.PREVENT);
+        report.highlightDetailEvenRows();
+
+        // Page Margin
+        report.setPageMargin(DynamicReports.margin().setLeft(13).setRight(13).setTop(8).setBottom(12));
+
+        if (data.isEmpty()) {
+            report.setWhenNoDataType(WhenNoDataType.ALL_SECTIONS_NO_DETAIL);
+        }
+
+        report.setDataSource(data);
+        report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
+
+        return report;
+    }
 }
