@@ -8,21 +8,18 @@ import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.domain.response.ml.MlEstimaResponse;
 import com.paglaai.estimaai.feign.MLFeign;
 import com.paglaai.estimaai.util.TitleCaseUtil;
-
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.dynamicreports.jasper.builder.JasperReportBuilder;
 import net.sf.dynamicreports.report.builder.DynamicReports;
-import net.sf.dynamicreports.report.builder.component.Components;
 import net.sf.dynamicreports.report.builder.component.TextFieldBuilder;
 import net.sf.dynamicreports.report.builder.component.VerticalListBuilder;
-import net.sf.dynamicreports.report.builder.expression.Expressions;
 import net.sf.dynamicreports.report.constant.*;
 import org.springframework.stereotype.Service;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,12 +68,12 @@ public class ReportService {
                         DynamicReports.cmp.verticalGap(2)));
 
         // Configuration when data splits into other pages
-        report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
-        report.setDetailSplitType(SplitType.PREVENT);
-        report.highlightDetailEvenRows();
+//        report.setDetailStyle(DynamicReports.stl.style().setRightPadding(5).setLeftPadding(5));
+//        report.setDetailSplitType(SplitType.PREVENT);
+//        report.highlightDetailEvenRows();
 
         // Page Margin
-        report.setPageMargin(DynamicReports.margin().setLeft(15).setRight(15).setTop(10).setBottom(40));
+        report.setPageMargin(DynamicReports.margin().setLeft(15).setRight(15).setTop(10).setBottom(15));
         report.setPageFormat(PageType.A4, PageOrientation.PORTRAIT);
 
         if (data.getReportDataList().isEmpty()) {
@@ -105,7 +102,6 @@ public class ReportService {
                                                                 .setHorizontalAlignment(HorizontalAlignment.CENTER)
                                                                 .setFontSize(10)
                                                                 .bold()
-                                                                //.setRightPadding(15)
                                                                 .setTopPadding(20)))));
 
         return report;
