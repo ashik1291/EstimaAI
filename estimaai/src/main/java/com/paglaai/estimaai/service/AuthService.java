@@ -3,6 +3,7 @@ package com.paglaai.estimaai.service;
 import com.paglaai.estimaai.domain.AuthenticationRequest;
 import com.paglaai.estimaai.domain.AuthenticationResponse;
 import com.paglaai.estimaai.domain.UserDto;
+import com.paglaai.estimaai.exception.ResourceAlreadyExistsException;
 import com.paglaai.estimaai.mapper.DtoToEntityMapper;
 import com.paglaai.estimaai.repository.RoleRepository;
 import com.paglaai.estimaai.repository.UserRepository;
@@ -43,6 +44,11 @@ public class AuthService {
 
   @Transactional(rollbackFor = Exception.class)
   public UserDto createUser(UserDto userDto) {
+
+    var existsByEmail = userRepository.findByEmail(userDto.getEmail());
+    if(existsByEmail != null){
+      throw new ResourceAlreadyExistsException("user already exists by email");
+    }
 
     var userEntity = dtoToEntityMapper.userDtoToEntity(userDto);
 

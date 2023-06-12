@@ -2,6 +2,7 @@ package com.paglaai.estimaai.advice;
 
 import com.paglaai.estimaai.exception.DynamicReportException;
 import com.paglaai.estimaai.exception.NoExportTypeFoundException;
+import com.paglaai.estimaai.exception.ResourceAlreadyExistsException;
 import com.paglaai.estimaai.exception.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body("Unauthorized");
+  }
+
+  @ExceptionHandler(ResourceAlreadyExistsException.class)
+  public ResponseEntity<String> handleException(ResourceAlreadyExistsException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(ex.getMessage());
   }
 
   @ExceptionHandler(RuntimeException.class)
