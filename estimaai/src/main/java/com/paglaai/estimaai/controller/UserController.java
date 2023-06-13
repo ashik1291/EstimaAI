@@ -5,6 +5,7 @@ import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
 import com.paglaai.estimaai.domain.response.WrapperReportData;
+import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
 import com.paglaai.estimaai.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,12 @@ public class UserController {
 
   @PostMapping("/save-processed-stories")
   public ResponseEntity<Boolean> saveProcessStoryToUserProfile(
-      @RequestBody WrapperReportData reportDataList, @RequestParam String title) {
-    return ResponseEntity.ok(userService.saveProcessedStoryToUserProfile(reportDataList, title));
+      @RequestBody WrapperReportData reportDataList, @RequestParam String title, @RequestParam(required = false) Long id) {
+    return ResponseEntity.ok(userService.saveProcessedStoryToUserProfile(reportDataList, title, id));
+  }
+
+  @GetMapping("report-history-by-id")
+  public ResponseEntity<ReportHistoryEntity> getReportHistoryById(@RequestParam long id){
+    return ResponseEntity.ok(userService.getReportHistoryById(id));
   }
 }

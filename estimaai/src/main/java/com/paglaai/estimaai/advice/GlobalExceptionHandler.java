@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex) {
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body("Unauthorized");
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body("Bad Credentials");
   }
 
   @ExceptionHandler(ResourceAlreadyExistsException.class)

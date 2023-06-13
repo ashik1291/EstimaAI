@@ -16,6 +16,7 @@ import com.paglaai.estimaai.repository.entity.UserTeamMemberSurveyEntity;
 import com.paglaai.estimaai.util.StringUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,19 +97,33 @@ public class UserService {
     return true;
   }
 
-  public Boolean saveProcessedStoryToUserProfile(WrapperReportData data, String title) {
-    var reportHistoryEntity = new ReportHistoryEntity();
-    reportHistoryEntity.setTitle(StringUtil.nullToTitleString(title));
-    reportHistoryEntity.setGenerationTime(LocalDateTime.now());
-    reportHistoryEntity.setJsonData(data);
-    reportHistoryEntity.setUsers(
-        userRepository.findByEmail(
-            SecurityContextHolder.getContext().getAuthentication().getName()));
+  public Boolean saveProcessedStoryToUserProfile(WrapperReportData data, String title, Long id) {
+    ReportHistoryEntity reportHistoryEntity;
+    if(id == null || id == 0){
+      reportHistoryEntity = new ReportHistoryEntity();
+      reportHistoryEntity.setTitle(StringUtil.nullToTitleString(title));
+      reportHistoryEntity.setGenerationTime(LocalDateTime.now());
+      reportHistoryEntity.setJsonData(data);
+      reportHistoryEntity.setUsers(
+              userRepository.findByEmail(
+                      SecurityContextHolder.getContext().getAuthentication().getName()));
+    }else {
+      reportHistoryEntity = this.getReportHistoryById(id);
+      reportHistoryEntity.setJsonData(data);
+    }
     reportHistoryRepository.save(reportHistoryEntity);
+
 
     return true;
   }
 
+  public ReportHistoryEntity getReportHistoryById(long id){
+    var reportHistoryEntity = reportHistoryRepository.findById(id);
+    if(reportHistoryEntity.isEmpty()){
+      throw new NoSuchElementException("No report history entity found");
+    }
+    return reportHistoryEntity.get();
+  }
   private UserTeamMemberSurveyEntity requestToEntityForUpdate(
       UserTeamMemberSurveyEntity userTeamMemberSurveyEntity,
       TeamMemberSurveyRequest teamMemberSurveyRequest) {
