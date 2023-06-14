@@ -1,10 +1,9 @@
 package com.paglaai.estimaai.repository;
 
-import com.paglaai.estimaai.repository.entity.User;
+import com.paglaai.estimaai.repository.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    User findByEmail(String email);
-
+  UserEntity findByEmail(String email);
 }

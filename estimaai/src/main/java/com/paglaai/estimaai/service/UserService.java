@@ -1,59 +1,196 @@
 package com.paglaai.estimaai.service;
 
-import com.paglaai.estimaai.domain.dto.UserDto;
-import com.paglaai.estimaai.repository.entity.Role;
-import com.paglaai.estimaai.repository.entity.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.paglaai.estimaai.domain.BreakdownData;
+import com.paglaai.estimaai.domain.UserDto;
+import com.paglaai.estimaai.domain.UserProfileWithHistories;
+import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
+import com.paglaai.estimaai.domain.response.ReportData;
+import com.paglaai.estimaai.domain.response.WrapperReportData;
+import com.paglaai.estimaai.exception.UserNotFoundException;
+import com.paglaai.estimaai.mapper.DtoToEntityMapper;
+import com.paglaai.estimaai.repository.ReportHistoryRepository;
 import com.paglaai.estimaai.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
+import com.paglaai.estimaai.repository.UserTeamMemberSurveyRepository;
+import com.paglaai.estimaai.repository.entity.ReportHistoryEntity;
+import com.paglaai.estimaai.repository.entity.UserEntity;
+import com.paglaai.estimaai.repository.entity.UserTeamMemberSurveyEntity;
+import com.paglaai.estimaai.util.StringUtil;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+  private final UserRepository userRepository;
+  private final UserTeamMemberSurveyRepository userTeamMemberSurveyRepository;
+  private final ReportHistoryRepository reportHistoryRepository;
 
-    private final UserRepository userRepository;
-    private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
+  public UserDto findUserByEmail(String email) {
 
-    public void saveUser(UserDto userDto){
+    var userEntity = userRepository.findByEmail(email);
+    if (userEntity == null) {
+      throw new UserNotFoundException("No user was found.");
+    }
+    return mapToUserDto(userEntity);
+  }
 
-        User user = new User();
-        var lastName = userDto.getLastName() == null ? "": userDto.getLastName();
-        user.setName(userDto.getFirstName().concat(" ").concat(lastName))
-                .setEmail(userDto.getEmail())
-                .setPassword(passwordEncoder.encode(userDto.getPassword()));
+  public List<UserDto> findAllUsers() {
+    List<UserEntity> users = userRepository.findAll();
+    return users.stream().map(this::mapToUserDto).collect(Collectors.toList());
+  }
 
-        Role role = roleService.getRoleByName("ROLE_ADMIN");
-        if(role == null){
-            role = roleService.checkRoleExist();
-        }
-        user.setRoles(Collections.singletonList(role));
-        userRepository.save(user);
+  public UserProfileWithHistories getProfileWithReportHistory() throws JsonProcessingException {
+    var email = SecurityContextHolder.getContext().getAuthentication().getName();
+    var userEntity = userRepository.findByEmail(email);
+    if (userEntity == null) {
+      throw new UserNotFoundException("No user profile found.");
     }
 
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    var userProfileWithHistories = new UserProfileWithHistories();
+    userProfileWithHistories.setName(userEntity.getName());
+    userProfileWithHistories.setEmail(email);
+    userProfileWithHistories.setReportHistories(userEntity.getReportHistoryEntities());
+    userProfileWithHistories.setUserTeamMemberSurvey(userEntity.getUserTeamMemberSurveyEntity());
+
+    return userProfileWithHistories;
+  }
+
+  public Boolean createOrUpdateUserTeamMemberSurvey(
+      TeamMemberSurveyRequest teamMemberSurveyRequest) {
+
+    var email = SecurityContextHolder.getContext().getAuthentication().getName();
+    var userEntity = userRepository.findByEmail(email);
+    if (userEntity == null) {
+      throw new UserNotFoundException("No user profile found to set survey");
     }
 
+    if (teamMemberSurveyRequest.getId() == 0 || teamMemberSurveyRequest.getId() == null) {
+      var existingSurveyForUser =
+          userTeamMemberSurveyRepository.findByUserEntity_Id(userEntity.getId());
+      if (existingSurveyForUser != null) {
+        throw new RuntimeException(
+            "can't create team survey. Because survey already exists for user");
+      }
+      var userTeamMemberSurveyEntity =
+          DtoToEntityMapper.requestToEntityWithoutIdAndUserEntity(teamMemberSurveyRequest);
+      userTeamMemberSurveyEntity.setUserEntity(userEntity);
+      userTeamMemberSurveyRepository.save(userTeamMemberSurveyEntity);
 
-    public List<UserDto> findAllUsers() {
-        List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(this::mapToUserDto)
-                .collect(Collectors.toList());
+    } else {
+      var surveyEntityOptional =
+          userTeamMemberSurveyRepository.findById(teamMemberSurveyRequest.getId());
+      if (surveyEntityOptional.isEmpty()) {
+        throw new RuntimeException("no survey record found to update");
+      }
+
+      var surveyRecord = surveyEntityOptional.get();
+      var userTeamMemberSurveyEntity =
+          this.requestToEntityForUpdate(surveyRecord, teamMemberSurveyRequest);
+
+      userTeamMemberSurveyRepository.save(userTeamMemberSurveyEntity);
     }
 
-    private UserDto mapToUserDto(User user){
-        UserDto userDto = new UserDto();
-        String[] str = user.getName().split(" ");
-        userDto.setFirstName(str[0]);
-        userDto.setLastName(str[1]);
-        userDto.setEmail(user.getEmail());
-        return userDto;
+    return true;
+  }
+
+  public Boolean saveProcessedStoryToUserProfile(WrapperReportData data, String title, Long id) {
+    ReportHistoryEntity reportHistoryEntity;
+
+    if(data != null){
+      var totalTime = getTotalTime(data.getReportDataList());
+      data.setTotalTime(totalTime);
+    }else{
+      throw new RuntimeException("data is null");
     }
+
+    if(id == null || id == 0){
+      reportHistoryEntity = new ReportHistoryEntity();
+      reportHistoryEntity.setTitle(StringUtil.nullToTitleString(title));
+      reportHistoryEntity.setGenerationTime(LocalDateTime.now());
+      reportHistoryEntity.setJsonData(data);
+      reportHistoryEntity.setUsers(
+              userRepository.findByEmail(
+                      SecurityContextHolder.getContext().getAuthentication().getName()));
+    }else {
+      reportHistoryEntity = this.getReportHistoryById(id);
+      reportHistoryEntity.setJsonData(data);
+    }
+    reportHistoryRepository.save(reportHistoryEntity);
+
+
+    return true;
+  }
+
+  private long getTotalTime(List<ReportData> reportDataList) {
+    long count = 0;
+
+    for (var reportData : reportDataList) {
+      count += reportData.getTotalTime();
+    }
+
+    return count;
+  }
+
+  public ReportHistoryEntity getReportHistoryById(long id){
+    var reportHistoryEntity = reportHistoryRepository.findById(id);
+    if(reportHistoryEntity.isEmpty()){
+      throw new NoSuchElementException("No report history entity found");
+    }
+    return reportHistoryEntity.get();
+  }
+  private UserTeamMemberSurveyEntity requestToEntityForUpdate(
+      UserTeamMemberSurveyEntity userTeamMemberSurveyEntity,
+      TeamMemberSurveyRequest teamMemberSurveyRequest) {
+
+    if (teamMemberSurveyRequest.getTeamExp() != null) {
+      userTeamMemberSurveyEntity.setTeamExp(teamMemberSurveyRequest.getTeamExp());
+    }
+    if (teamMemberSurveyRequest.getManagerExp() != null) {
+      userTeamMemberSurveyEntity.setManagerExp(teamMemberSurveyRequest.getManagerExp());
+    }
+    if (teamMemberSurveyRequest.getYearEnd() != null) {
+      userTeamMemberSurveyEntity.setYearEnd(teamMemberSurveyRequest.getYearEnd());
+    }
+    if (teamMemberSurveyRequest.getLength() != null) {
+      userTeamMemberSurveyEntity.setLength(teamMemberSurveyRequest.getLength());
+    }
+    if (teamMemberSurveyRequest.getEffort() != null) {
+      userTeamMemberSurveyEntity.setEffort(teamMemberSurveyRequest.getEffort());
+    }
+    if (teamMemberSurveyRequest.getTransactions() != null) {
+      userTeamMemberSurveyEntity.setTransactions(teamMemberSurveyRequest.getTransactions());
+    }
+    if (teamMemberSurveyRequest.getEntities() != null) {
+      userTeamMemberSurveyEntity.setEntities(teamMemberSurveyRequest.getEntities());
+    }
+    if (teamMemberSurveyRequest.getPointsAdjust() != null) {
+      userTeamMemberSurveyEntity.setPointsAdjust(teamMemberSurveyRequest.getPointsAdjust());
+    }
+    if (teamMemberSurveyRequest.getEnvergure() != null) {
+      userTeamMemberSurveyEntity.setEntities(teamMemberSurveyRequest.getEnvergure());
+    }
+    if (teamMemberSurveyRequest.getPointsNonAdjust() != null) {
+      userTeamMemberSurveyEntity.setPointsNonAdjust(teamMemberSurveyRequest.getPointsNonAdjust());
+    }
+    if (teamMemberSurveyRequest.getLanguage() != null) {
+      userTeamMemberSurveyEntity.setLanguage(teamMemberSurveyRequest.getLanguage());
+    }
+
+    return userTeamMemberSurveyEntity;
+  }
+
+  private UserDto mapToUserDto(UserEntity user) {
+    UserDto userDto = new UserDto();
+    String[] str = user.getName().split(" ");
+    userDto.setFirstName(str[0]);
+    userDto.setLastName(str[1]);
+    userDto.setEmail(user.getEmail());
+    return userDto;
+  }
 }
