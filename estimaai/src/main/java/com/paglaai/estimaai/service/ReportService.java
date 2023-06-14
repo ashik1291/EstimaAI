@@ -329,7 +329,13 @@ public class ReportService {
         long count = 0;
 
         for (var pojo : pojoList) {
-            count += Long.parseLong(pojo.getImplementationTime().replaceAll("[.,\\p{P}]", ""));
+            var temp = pojo.getImplementationTime().replaceAll("[.,\\p{P}]", "");
+            if(temp.isEmpty()){
+                temp = String.valueOf(pojo.getComplexity().equalsIgnoreCase("1") ? 3 : pojo.getComplexity().equalsIgnoreCase("2") ?
+                        6 : pojo.getComplexity().equalsIgnoreCase("3") ? 2 : pojo.getComplexity().equalsIgnoreCase("4") ?
+                        28 : pojo.getComplexity().equalsIgnoreCase("5") ? 40 : 0);
+            }
+            count += Long.parseLong(temp);
         }
 
         return count;
