@@ -37,7 +37,7 @@ public class UserController {
 
   @PostMapping("/save-processed-stories")
   public ResponseEntity<Boolean> saveProcessStoryToUserProfile(
-      @RequestBody WrapperReportData reportDataList, @RequestParam String title, @RequestParam(required = false) Long id) {
+      @RequestBody WrapperReportData reportDataList, @RequestParam(required = false) String title, @RequestParam(required = false) Long id) {
     return ResponseEntity.ok(userService.saveProcessedStoryToUserProfile(reportDataList, title, id));
   }
 

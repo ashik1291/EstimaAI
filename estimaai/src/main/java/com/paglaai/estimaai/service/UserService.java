@@ -1,9 +1,11 @@
 package com.paglaai.estimaai.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.paglaai.estimaai.domain.BreakdownData;
 import com.paglaai.estimaai.domain.UserDto;
 import com.paglaai.estimaai.domain.UserProfileWithHistories;
 import com.paglaai.estimaai.domain.request.TeamMemberSurveyRequest;
+import com.paglaai.estimaai.domain.response.ReportData;
 import com.paglaai.estimaai.domain.response.WrapperReportData;
 import com.paglaai.estimaai.exception.UserNotFoundException;
 import com.paglaai.estimaai.mapper.DtoToEntityMapper;
@@ -99,6 +101,14 @@ public class UserService {
 
   public Boolean saveProcessedStoryToUserProfile(WrapperReportData data, String title, Long id) {
     ReportHistoryEntity reportHistoryEntity;
+
+    if(data != null){
+      var totalTime = getTotalTime(data.getReportDataList());
+      data.setTotalTime(totalTime);
+    }else{
+      throw new RuntimeException("data is null");
+    }
+
     if(id == null || id == 0){
       reportHistoryEntity = new ReportHistoryEntity();
       reportHistoryEntity.setTitle(StringUtil.nullToTitleString(title));
@@ -115,6 +125,16 @@ public class UserService {
 
 
     return true;
+  }
+
+  private long getTotalTime(List<ReportData> reportDataList) {
+    long count = 0;
+
+    for (var reportData : reportDataList) {
+      count += reportData.getTotalTime();
+    }
+
+    return count;
   }
 
   public ReportHistoryEntity getReportHistoryById(long id){
