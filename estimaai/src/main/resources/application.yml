@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/estimaai
     username: root
-    password: admin
+    password: ''
 
   jpa:
     properties:
@@ -18,7 +18,7 @@ spring:
       client:
         config:
           mlService:
-            url: 'http://192.168.217.190:5000'
+            url: 'http://127.0.0.1:5000'
             connectTimeout: 60000
             readTimeout: 60000
             loggerLevel: full

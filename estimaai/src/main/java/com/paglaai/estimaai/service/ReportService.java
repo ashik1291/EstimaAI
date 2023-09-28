@@ -268,9 +268,9 @@ public class ReportService {
 
                 for (var sub : subTask) {
                     var breakdownData = new BreakdownData();
-                    breakdownData.setFeatureTitle(mlResponse.getFeatureTitle());
-                    breakdownData.setSubtasksOfFeatures(sub.getSubtasksOfFeatures());
-                    breakdownData.setFeatureIntent(sub.getFeatureIntent());
+                    breakdownData.setFeatureTitle(mlResponse.getFeatureTitle() != null ? mlResponse.getFeatureTitle() : " ");
+                    breakdownData.setSubtasksOfFeatures(sub.getSubtasksOfFeatures() != null ? sub.getSubtasksOfFeatures() : " ");
+                    breakdownData.setFeatureIntent(sub.getFeatureIntent() != null ? sub.getFeatureIntent() : " ");
                     breakdownData.setImplementationTime(sub.getImplementationTime());
                     breakdownData.setComplexity(sub.getComplexity());
                     breakDownList.add(breakdownData);
@@ -329,11 +329,11 @@ public class ReportService {
         long count = 0;
 
         for (var pojo : pojoList) {
-            var temp = pojo.getImplementationTime().replaceAll("[.,\\p{P}]", "");
+            var temp = pojo.getImplementationTime() != null && !pojo.getImplementationTime().isBlank()? pojo.getImplementationTime().replaceAll("[.,\\p{P}]", "") : String.valueOf(5);
             if(temp.isEmpty()){
-                temp = String.valueOf(pojo.getComplexity().equalsIgnoreCase("1") ? 3 : pojo.getComplexity().equalsIgnoreCase("2") ?
+                temp = String.valueOf(pojo.getComplexity() != null && !pojo.getComplexity().isBlank()? pojo.getComplexity().equalsIgnoreCase("1") ? 3 : pojo.getComplexity().equalsIgnoreCase("2") ?
                         6 : pojo.getComplexity().equalsIgnoreCase("3") ? 2 : pojo.getComplexity().equalsIgnoreCase("4") ?
-                        28 : pojo.getComplexity().equalsIgnoreCase("5") ? 40 : 0);
+                        28 : pojo.getComplexity().equalsIgnoreCase("5") ? 40 : 0 : 2);
             }
             count += Long.parseLong(temp);
         }
